@@ -37,8 +37,8 @@
         const SHEET_ID = '1G1UjWN_ru3PdQf-qlKuwIT5CCfQSuA6reOzQZdu6FW8';
         const API_KEY = 'AIzaSyAmOoWpQprHyZS97DiIXCdy2LFkAe0POa8';
 
-        const configUrl = `https://sheets.googleapis.com/v4/spreadsheets/${1G1UjWN_ru3PdQf-qlKuwIT5CCfQSuA6reOzQZdu6FW8}/values/Configuration?key=${AIzaSyAmOoWpQprHyZS97DiIXCdy2LFkAe0POa8}`;
-        const contentUrl = `https://sheets.googleapis.com/v4/spreadsheets/${1G1UjWN_ru3PdQf-qlKuwIT5CCfQSuA6reOzQZdu6FW8}/values/Content?key=${AIzaSyAmOoWpQprHyZS97DiIXCdy2LFkAe0POa8}`;
+        const configUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Configuration?key=${API_KEY}`;
+        const contentUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Content?key=${API_KEY}`;
 
         // Fetch configuration
         fetch(configUrl)
