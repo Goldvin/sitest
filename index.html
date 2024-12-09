@@ -3,77 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website with Google Sheets</title>
+    <title>Dynamic Website</title>
+    <link rel="icon" id="favicon" type="image/x-icon">
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
         }
+        nav {
+            display: flex;
+            background-color: #f4f4f4;
+            padding: 10px;
+            justify-content: center;
+        }
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: black;
+        }
         .header {
             text-align: center;
-            padding: 20px;
             color: white;
+            padding: 50px;
         }
         .content {
             padding: 20px;
         }
-        .post {
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 10px;
-        }
         .post img {
             max-width: 100%;
-            height: auto;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="header" id="header"></div>
+    <nav id="navbar"></nav>
+    <header id="header"></header>
     <div class="content" id="content"></div>
+    <footer id="footer"></footer>
 
     <script>
         const SHEET_ID = '1G1UjWN_ru3PdQf-qlKuwIT5CCfQSuA6reOzQZdu6FW8';
         const API_KEY = 'AIzaSyAmOoWpQprHyZS97DiIXCdy2LFkAe0POa8';
 
-        const configUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Configuration?key=${API_KEY}`;
-        const contentUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Content?key=${API_KEY}`;
+        const siteSettingsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Site%20Settings?key=${API_KEY}`;
+        const navbarUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Navbar?key=${API_KEY}`;
+        const headerUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Header?key=${API_KEY}`;
+        const contentUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Body?key=${API_KEY}`;
+        const footerUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Footer?key=${API_KEY}`;
+        const seoUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/SEO%20Settings?key=${API_KEY}`;
 
-        // Fetch configuration
-        fetch(configUrl)
-            .then(response => response.json())
-            .then(data => {
-                const rows = data.values;
-                const config = {};
-                rows.forEach(row => {
-                    config[row[0]] = row[1];
-                });
+        const fetchData = async (url) => {
+            const response = await fetch(url);
+            return response.json();
+        };
 
-                // Set header
-                const header = document.getElementById('header');
-                header.style.backgroundColor = config.header_color;
-                header.innerHTML = `<h1>${config.site_name}</h1><p>${config.description}</p>`;
+        const renderNavbar = async () => {
+            const data = await fetchData(navbarUrl);
+            const navbar = document.getElementById('navbar');
+            data.values.slice(1).forEach(row => {
+                const a = document.createElement('a');
+                a.href = row[1];
+                a.textContent = row[0];
+                navbar.appendChild(a);
             });
+        };
 
-        // Fetch content
-        fetch(contentUrl)
-            .then(response => response.json())
-            .then(data => {
-                const rows = data.values.slice(1); // Skip header
-                const contentDiv = document.getElementById('content');
+        const renderHeader = async () => {
+            const data = await fetchData(headerUrl);
+            const row = data.values[1];
+            const header = document.getElementById('header');
+            header.style.backgroundImage = `url(${row[2]})`;
+            header.innerHTML = `<h1>${row[0]}</h1><p>${row[1]}</p>`;
+        };
 
-                rows.forEach(row => {
-                    const postDiv = document.createElement('div');
-                    postDiv.className = 'post';
-                    postDiv.innerHTML = `
-                        <h2>${row[0]}</h2>
-                        <p>${row[1]}</p>
-                        <img src="${row[2]}" alt="${row[0]}">
-                    `;
-                    contentDiv.appendChild(postDiv);
-                });
+        const renderContent = async () => {
+            const data = await fetchData(contentUrl);
+            const content = document.getElementById('content');
+            data.values.slice(1).forEach(row => {
+                const div = document.createElement('div');
+                div.className = 'post';
+                div.innerHTML = `<h2>${row[0]}</h2><p>${row[1]}</p><img src="${row[2]}" alt="${row[0]}"><a href="${row[3]}">Read More</a>`;
+                content.appendChild(div);
             });
+        };
+
+        const renderFooter = async () => {
+            const data = await fetchData(footerUrl);
+            const footer = document.getElementById('footer');
+            const row = data.values[1];
+            footer.style.backgroundColor = row[1];
+            footer.style.color = row[2];
+            footer.textContent = row[0];
+        };
+
+        const applySEO = async () => {
+            const data = await fetchData(seoUrl);
+            const seoSettings = {};
+            data.values.forEach(row => seoSettings[row[0]] = row[1]);
+
+            document.title = seoSettings.meta_title;
+            document.querySelector('meta[name="description"]').setAttribute('content', seoSettings.meta_description);
+            document.getElementById('favicon').href = seoSettings.favicon;
+        };
+
+        const init = async () => {
+            await renderNavbar();
+            await renderHeader();
+            await renderContent();
+            await renderFooter();
+            await applySEO();
+        };
+
+        init();
     </script>
 </body>
 </html>
