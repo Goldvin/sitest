@@ -6,42 +6,55 @@
     <title>Dynamic Website</title>
     <link rel="icon" id="favicon" type="image/x-icon">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+        /* Add all the previous styles here */
+        .carousel {
+            position: relative;
+            overflow: hidden;
+            height: 400px;
+            background-color: #ddd;
         }
-        nav {
-            display: flex;
-            background-color: #f4f4f4;
-            padding: 10px;
-            justify-content: center;
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: opacity 1s;
+            opacity: 0;
         }
-        nav a {
-            margin: 0 15px;
-            text-decoration: none;
-            color: black;
+        .carousel-slide.active {
+            opacity: 1;
         }
-        .header {
-            text-align: center;
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .carousel-caption {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
             color: white;
-            padding: 50px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
         }
-        .content {
-            padding: 20px;
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
         }
-        .post img {
-            max-width: 100%;
-        }
-        footer {
-            text-align: center;
-            padding: 20px;
+        .filters select, .filters input {
+            padding: 10px;
+            font-size: 1em;
         }
     </style>
 </head>
 <body>
     <nav id="navbar"></nav>
-    <header id="header"></header>
+    <div class="carousel" id="header"></div>
+    <div class="filters">
+        <select id="filter-tags">
+            <option value="">All Tags</option>
+        </select>
+        <input type="text" id="search-input" placeholder="Search by title or tag">
+    </div>
     <div class="content" id="content"></div>
     <footer id="footer"></footer>
 
@@ -49,7 +62,6 @@
         const SHEET_ID = '1G1UjWN_ru3PdQf-qlKuwIT5CCfQSuA6reOzQZdu6FW8';
         const API_KEY = 'AIzaSyAmOoWpQprHyZS97DiIXCdy2LFkAe0POa8';
 
-        const siteSettingsUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Site%20Settings?key=${API_KEY}`;
         const navbarUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Navbar?key=${API_KEY}`;
         const headerUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Header?key=${API_KEY}`;
         const contentUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Body?key=${API_KEY}`;
@@ -74,21 +86,77 @@
 
         const renderHeader = async () => {
             const data = await fetchData(headerUrl);
-            const row = data.values[1];
             const header = document.getElementById('header');
-            header.style.backgroundImage = `url(${row[2]})`;
-            header.innerHTML = `<h1>${row[0]}</h1><p>${row[1]}</p>`;
+            data.values.slice(1).forEach((row, index) => {
+                const slide = document.createElement('div');
+                slide.className = `carousel-slide ${index === 0 ? 'active' : ''}`;
+                slide.innerHTML = `
+                    <img src="${row[2]}" alt="${row[0]}">
+                    <div class="carousel-caption">
+                        <h1>${row[0]}</h1>
+                        <p>${row[1]}</p>
+                    </div>
+                `;
+                header.appendChild(slide);
+            });
+
+            let currentIndex = 0;
+            setInterval(() => {
+                const slides = document.querySelectorAll('.carousel-slide');
+                slides[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % slides.length;
+                slides[currentIndex].classList.add('active');
+            }, 5000);
         };
 
         const renderContent = async () => {
             const data = await fetchData(contentUrl);
             const content = document.getElementById('content');
-            data.values.slice(1).forEach(row => {
-                const div = document.createElement('div');
-                div.className = 'post';
-                div.innerHTML = `<h2>${row[0]}</h2><p>${row[1]}</p><img src="${row[2]}" alt="${row[0]}"><a href="${row[3]}">Read More</a>`;
-                content.appendChild(div);
+            const tagsDropdown = document.getElementById('filter-tags');
+            const searchInput = document.getElementById('search-input');
+
+            const renderPosts = (filteredPosts) => {
+                content.innerHTML = '';
+                filteredPosts.forEach(row => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.onclick = () => window.location.href = row[3];
+                    card.innerHTML = `
+                        <img src="${row[2]}" alt="${row[0]}">
+                        <div class="card-body">
+                            <a href="${row[3]}" class="card-title">${row[0]}</a>
+                            <p class="card-tag">Tag: ${row[4]}</p>
+                            <p class="card-description">${row[1]}</p>
+                        </div>
+                    `;
+                    content.appendChild(card);
+                });
+            };
+
+            const allPosts = data.values.slice(1);
+            const uniqueTags = [...new Set(allPosts.map(row => row[4]))];
+            uniqueTags.forEach(tag => {
+                const option = document.createElement('option');
+                option.value = tag;
+                option.textContent = tag;
+                tagsDropdown.appendChild(option);
             });
+
+            const filterAndSearch = () => {
+                const selectedTag = tagsDropdown.value;
+                const searchTerm = searchInput.value.toLowerCase();
+                const filteredPosts = allPosts.filter(row => {
+                    const matchesTag = !selectedTag || row[4] === selectedTag;
+                    const matchesSearch = row[0].toLowerCase().includes(searchTerm) || row[4].toLowerCase().includes(searchTerm);
+                    return matchesTag && matchesSearch;
+                });
+                renderPosts(filteredPosts);
+            };
+
+            tagsDropdown.addEventListener('change', filterAndSearch);
+            searchInput.addEventListener('input', filterAndSearch);
+
+            renderPosts(allPosts);
         };
 
         const renderFooter = async () => {
