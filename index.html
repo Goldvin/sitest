@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website with Google Sheets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            text-align: center;
+            padding: 20px;
+            color: white;
+        }
+        .content {
+            padding: 20px;
+        }
+        .post {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        .post img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="header" id="header"></div>
+    <div class="content" id="content"></div>
+
+    <script>
+        const SHEET_ID = '1G1UjWN_ru3PdQf-qlKuwIT5CCfQSuA6reOzQZdu6FW8';
+        const API_KEY = 'AIzaSyAmOoWpQprHyZS97DiIXCdy2LFkAe0POa8';
+
+        const configUrl = `https://sheets.googleapis.com/v4/spreadsheets/${1G1UjWN_ru3PdQf-qlKuwIT5CCfQSuA6reOzQZdu6FW8}/values/Configuration?key=${AIzaSyAmOoWpQprHyZS97DiIXCdy2LFkAe0POa8}`;
+        const contentUrl = `https://sheets.googleapis.com/v4/spreadsheets/${1G1UjWN_ru3PdQf-qlKuwIT5CCfQSuA6reOzQZdu6FW8}/values/Content?key=${AIzaSyAmOoWpQprHyZS97DiIXCdy2LFkAe0POa8}`;
+
+        // Fetch configuration
+        fetch(configUrl)
+            .then(response => response.json())
+            .then(data => {
+                const rows = data.values;
+                const config = {};
+                rows.forEach(row => {
+                    config[row[0]] = row[1];
+                });
+
+                // Set header
+                const header = document.getElementById('header');
+                header.style.backgroundColor = config.header_color;
+                header.innerHTML = `<h1>${config.site_name}</h1><p>${config.description}</p>`;
+            });
+
+        // Fetch content
+        fetch(contentUrl)
+            .then(response => response.json())
+            .then(data => {
+                const rows = data.values.slice(1); // Skip header
+                const contentDiv = document.getElementById('content');
+
+                rows.forEach(row => {
+                    const postDiv = document.createElement('div');
+                    postDiv.className = 'post';
+                    postDiv.innerHTML = `
+                        <h2>${row[0]}</h2>
+                        <p>${row[1]}</p>
+                        <img src="${row[2]}" alt="${row[0]}">
+                    `;
+                    contentDiv.appendChild(postDiv);
+                });
+            });
+    </script>
+</body>
+</html>
