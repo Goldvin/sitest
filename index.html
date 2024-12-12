@@ -34,30 +34,79 @@
             background-color: var(--body-bg);
             color: var(--body-font);
         }
+
         nav {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
             background-color: var(--navbar-bg);
             color: var(--navbar-font);
-            padding: 15px;
+            padding: 10px 20px;
         }
-        nav a {
+        nav .nav-links a {
             text-decoration: none;
             color: inherit;
             font-size: var(--navbar-font-size);
             font-family: var(--navbar-font-family);
-            padding: 10px 15px;
+            margin: 0 10px;
         }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        .content {
+
+        .filter-search {
+            display: flex;
+            gap: 10px;
             padding: 20px;
+        }
+        .filter-search input, .filter-search select {
+            padding: 10px;
+            font-size: var(--body-font-size);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .header-carousel {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+        }
+        .header-carousel img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            transition: opacity 1s ease-in-out;
+            opacity: 0;
+        }
+        .header-carousel img.active {
+            opacity: 1;
+        }
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            gap: 10px;
+        }
+        .carousel-dot {
+            width: var(--dot-size);
+            height: var(--dot-size);
+            background-color: var(--dot-color);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .carousel-dot.active {
+            background-color: var(--dot-active-color);
+        }
+
+        .content {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
+            padding: 20px;
         }
+
         .card {
             background: #fff;
             border: 1px solid #ddd;
@@ -90,30 +139,36 @@
             font-size: 14px;
             color: #666;
         }
-        .search-container {
+
+        footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-font);
+            font-size: var(--footer-font-size);
             text-align: center;
-            margin-bottom: 20px;
+            padding: 20px;
         }
-        .search-input, .tag-select {
-            padding: 10px;
-            font-size: 16px;
-            margin: 5px;
+        footer .footer-section {
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
-    <nav id="navbar"></nav>
-    <div class="search-container">
-        <input type="text" id="search-input" class="search-input" placeholder="Search by title or tag">
-        <select id="tag-select" class="tag-select">
-            <option value="">All Tags</option>
+    <nav>
+        <div class="nav-brand">My Website</div>
+        <div class="nav-links" id="navbar"></div>
+    </nav>
+    <div class="filter-search">
+        <input type="text" id="search-input" placeholder="Search by title or tags...">
+        <select id="tag-filter">
+            <option value="">Filter by tag</option>
         </select>
     </div>
+    <div class="header-carousel" id="header-carousel"></div>
     <div class="content" id="content"></div>
     <footer>
-        <div id="footer-address"></div>
-        <div id="footer-links"></div>
-        <div id="footer-contact"></div>
+        <div class="footer-section" id="footer-address"></div>
+        <div class="footer-section" id="footer-links"></div>
+        <div class="footer-section" id="footer-contact"></div>
     </footer>
 
     <script>
@@ -123,7 +178,8 @@
         const urls = {
             navbar: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Navbar?key=${API_KEY}`,
             body: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Body?key=${API_KEY}`,
-            footer: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Footer?key=${API_KEY}`
+            header: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Header?key=${API_KEY}`,
+            footer: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Footer?key=${API_KEY}`,
         };
 
         const fetchData = async (url) => {
@@ -139,56 +195,90 @@
             `).join('');
         };
 
-        const renderFooter = async () => {
-            const data = await fetchData(urls.footer);
-            document.getElementById('footer-address').innerText = data.values[1][0];
-            document.getElementById('footer-links').innerHTML = data.values.slice(2, -1).map(row => `
-                <a href="${row[1]}" target="_blank">${row[0]}</a>
-            `).join(' | ');
-            document.getElementById('footer-contact').innerText = data.values[data.values.length - 1][0];
-        };
+        const renderCarousel = async () => {
+            const data = await fetchData(urls.header);
+            const carousel = document.getElementById('header-carousel');
+            const dots = document.createElement('div');
+            dots.className = 'carousel-dots';
 
-        const renderCards = async (searchTerm = '', selectedTag = '') => {
-            const data = await fetchData(urls.body);
-            const content = document.getElementById('content');
-            const filteredData = data.values.slice(1).filter(row => {
-                const matchesSearch = row[1].toLowerCase().includes(searchTerm.toLowerCase());
-                const matchesTag = selectedTag === '' || row[2] === selectedTag;
-                return matchesSearch && matchesTag;
+            const slides = data.values.slice(1).map((row, index) => {
+                const img = document.createElement('img');
+                img.src = row[0];
+                img.alt = row[1];
+                img.classList.add('carousel-image');
+                if (index === 0) img.classList.add('active');
+                return img;
             });
 
-            content.innerHTML = filteredData.map(row => `
-                <div class="card">
-                    <img src="${row[0]}" alt="${row[1]}">
-                    <div class="card-body">
-                        <span class="card-tag">${row[2]}</span>
-                        <h3 class="card-title">${row[1]}</h3>
-                        <p class="card-description">${row[3]}</p>
-                    </div>
-                </div>
-            `).join('');
+            slides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'carousel-dot';
+                if (index === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    document.querySelector('.carousel-dot.active').classList.remove('active');
+                    document.querySelector('.carousel-image.active').classList.remove('active');
+                    dot.classList.add('active');
+                    slides[index].classList.add('active');
+                });
+                dots.appendChild(dot);
+            });
+
+            carousel.append(...slides, dots);
         };
 
-        const populateTagDropdown = async () => {
+        const renderCards = async () => {
             const data = await fetchData(urls.body);
-            const tags = [...new Set(data.values.slice(1).map(row => row[2]))];
-            const tagSelect = document.getElementById('tag-select');
-            tagSelect.innerHTML += tags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
+            const content = document.getElementById('content');
+            const searchInput = document.getElementById('search-input');
+            const tagFilter = document.getElementById('tag-filter');
+
+            const allTags = [...new Set(data.values.slice(1).map(row => row[2]))];
+            tagFilter.innerHTML += allTags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
+
+            const renderFiltered = () => {
+                const searchQuery = searchInput.value.toLowerCase();
+                const selectedTag = tagFilter.value;
+
+                const filteredData = data.values.slice(1).filter(row => {
+                    const matchesTitle = row[1].toLowerCase().includes(searchQuery);
+                    const matchesTag = selectedTag === '' || row[2] === selectedTag;
+                    return matchesTitle && matchesTag;
+                });
+
+                content.innerHTML = filteredData.map(row => `
+                    <div class="card">
+                        <img src="${row[0]}" alt="${row[1]}">
+                        <div class="card-body">
+                            <span class="card-tag">${row[2]}</span>
+                            <h3 class="card-title">${row[1]}</h3>
+                            <p class="card-description">${row[3]}</p>
+                        </div>
+                    </div>
+                `).join('');
+            };
+
+            searchInput.addEventListener('input', renderFiltered);
+            tagFilter.addEventListener('change', renderFiltered);
+
+            renderFiltered();
+        };
+
+        const renderFooter = async () => {
+            const data = await fetchData(urls.footer);
+            const footerAddress = document.getElementById('footer-address');
+            const footerLinks = document.getElementById('footer-links');
+            const footerContact = document.getElementById('footer-contact');
+
+            footerAddress.textContent = data.values.slice(1)[0][0];  // Assuming the first cell contains address
+            footerLinks.innerHTML = data.values.slice(1)[0].slice(1).map(link => `<a href="${link}">${link}</a>`).join(' | ');
+            footerContact.textContent = data.values.slice(1)[0].slice(2).join(' | ');  // Contact information may be split across columns
         };
 
         const init = async () => {
             await renderNavbar();
-            await renderFooter();
-            await populateTagDropdown();
+            await renderCarousel();
             await renderCards();
-
-            document.getElementById('search-input').addEventListener('input', (e) => {
-                renderCards(e.target.value, document.getElementById('tag-select').value);
-            });
-
-            document.getElementById('tag-select').addEventListener('change', (e) => {
-                renderCards(document.getElementById('search-input').value, e.target.value);
-            });
+            await renderFooter();
         };
 
         init();
