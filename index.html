@@ -69,17 +69,38 @@
             height: 300px;
             overflow: hidden;
         }
-        .header-carousel img {
+        .header-carousel .slide {
+            position: absolute;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            position: absolute;
             transition: opacity 1s ease-in-out;
             opacity: 0;
         }
-        .header-carousel img.active {
+        .header-carousel .slide.active {
             opacity: 1;
         }
+        .header-carousel .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .carousel-caption {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #fff;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        .carousel-caption h3 {
+            font-size: 24px;
+            margin: 0;
+        }
+        .carousel-caption p {
+            font-size: 18px;
+            margin: 5px 0 0;
+        }
+
         .carousel-dots {
             display: flex;
             justify-content: center;
@@ -202,12 +223,18 @@
             dots.className = 'carousel-dots';
 
             const slides = data.values.slice(1).map((row, index) => {
-                const img = document.createElement('img');
-                img.src = row[0];
-                img.alt = row[1];
-                img.classList.add('carousel-image');
-                if (index === 0) img.classList.add('active');
-                return img;
+                const slide = document.createElement('div');
+                slide.className = `slide ${index === 0 ? 'active' : ''}`;
+                slide.innerHTML = `
+                    <a href="${row[1]}" class="slide-link">
+                        <img src="${row[0]}" alt="${row[2]}">
+                        <div class="carousel-caption">
+                            <h3>${row[2]}</h3>
+                            <p>${row[3]}</p>
+                        </div>
+                    </a>
+                `;
+                return slide;
             });
 
             slides.forEach((_, index) => {
@@ -216,7 +243,7 @@
                 if (index === 0) dot.classList.add('active');
                 dot.addEventListener('click', () => {
                     document.querySelector('.carousel-dot.active').classList.remove('active');
-                    document.querySelector('.carousel-image.active').classList.remove('active');
+                    document.querySelector('.slide.active').classList.remove('active');
                     dot.classList.add('active');
                     slides[index].classList.add('active');
                 });
@@ -236,21 +263,20 @@
             tagFilter.innerHTML += allTags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
 
             const renderFiltered = () => {
-                const searchQuery = searchInput.value.toLowerCase();
-                const selectedTag = tagFilter.value;
+                const searchValue = searchInput.value.toLowerCase();
+                const filterValue = tagFilter.value;
 
-                const filteredData = data.values.slice(1).filter(row => {
-                    const matchesTitle = row[1].toLowerCase().includes(searchQuery);
-                    const matchesTag = selectedTag === '' || row[2] === selectedTag;
-                    return matchesTitle && matchesTag;
-                });
+                const filteredData = data.values.slice(1).filter(row =>
+                    (row[1].toLowerCase().includes(searchValue) || row[2].includes(searchValue)) &&
+                    (filterValue === '' || row[2] === filterValue)
+                );
 
                 content.innerHTML = filteredData.map(row => `
                     <div class="card">
                         <img src="${row[0]}" alt="${row[1]}">
                         <div class="card-body">
-                            <span class="card-tag">${row[2]}</span>
-                            <h3 class="card-title">${row[1]}</h3>
+                            <h2 class="card-title">${row[1]}</h2>
+                            <div class="card-tag">${row[2]}</div>
                             <p class="card-description">${row[3]}</p>
                         </div>
                     </div>
@@ -259,7 +285,6 @@
 
             searchInput.addEventListener('input', renderFiltered);
             tagFilter.addEventListener('change', renderFiltered);
-
             renderFiltered();
         };
 
