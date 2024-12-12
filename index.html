@@ -6,67 +6,125 @@
     <title>Dynamic Website</title>
     <link rel="icon" id="favicon" type="image/x-icon">
     <style>
-        /* Add all the previous styles here */
-        .carousel {
-            position: relative;
+        :root {
+            --navbar-bg: #3498db;
+            --navbar-font: #ffffff;
+            --navbar-font-size: 16px;
+            --navbar-font-family: 'Arial', sans-serif;
+
+            --footer-bg: #333333;
+            --footer-font: #ffffff;
+            --footer-font-size: 14px;
+            --footer-font-family: 'Verdana', sans-serif;
+
+            --body-bg: #f9f9f9;
+            --body-font: #333333;
+            --body-font-size: 16px;
+            --body-font-family: 'Arial', sans-serif;
+
+            --dot-color: #ffffff;
+            --dot-active-color: #ff4757;
+            --dot-size: 10px;
+        }
+
+        body {
+            font-family: var(--body-font-family);
+            margin: 0;
+            padding: 0;
+            background-color: var(--body-bg);
+            color: var(--body-font);
+        }
+        nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: var(--navbar-bg);
+            color: var(--navbar-font);
+            padding: 15px;
+        }
+        nav a {
+            text-decoration: none;
+            color: inherit;
+            font-size: var(--navbar-font-size);
+            font-family: var(--navbar-font-family);
+            padding: 10px 15px;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .content {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             overflow: hidden;
-            height: 400px;
-            background-color: #ddd;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        .carousel-slide {
-            position: absolute;
+        .card img {
             width: 100%;
-            height: 100%;
-            transition: opacity 1s;
-            opacity: 0;
-        }
-        .carousel-slide.active {
-            opacity: 1;
-        }
-        .carousel-slide img {
-            width: 100%;
-            height: 100%;
+            height: 180px;
             object-fit: cover;
         }
-        .carousel-caption {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        .card-body {
+            padding: 15px;
         }
-        .filters {
-            display: flex;
-            justify-content: space-between;
-            margin: 20px 0;
+        .card-title {
+            font-size: 18px;
+            margin: 0 0 10px;
         }
-        .filters select, .filters input {
+        .card-tag {
+            display: inline-block;
+            background-color: #3498db;
+            color: #fff;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .card-description {
+            font-size: 14px;
+            color: #666;
+        }
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .search-input, .tag-select {
             padding: 10px;
-            font-size: 1em;
+            font-size: 16px;
+            margin: 5px;
         }
     </style>
 </head>
 <body>
     <nav id="navbar"></nav>
-    <div class="carousel" id="header"></div>
-    <div class="filters">
-        <select id="filter-tags">
+    <div class="search-container">
+        <input type="text" id="search-input" class="search-input" placeholder="Search by title or tag">
+        <select id="tag-select" class="tag-select">
             <option value="">All Tags</option>
         </select>
-        <input type="text" id="search-input" placeholder="Search by title or tag">
     </div>
     <div class="content" id="content"></div>
-    <footer id="footer"></footer>
+    <footer>
+        <div id="footer-address"></div>
+        <div id="footer-links"></div>
+        <div id="footer-contact"></div>
+    </footer>
 
     <script>
         const SHEET_ID = '1G1UjWN_ru3PdQf-qlKuwIT5CCfQSuA6reOzQZdu6FW8';
         const API_KEY = 'AIzaSyAmOoWpQprHyZS97DiIXCdy2LFkAe0POa8';
 
-        const navbarUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Navbar?key=${API_KEY}`;
-        const headerUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Header?key=${API_KEY}`;
-        const contentUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Body?key=${API_KEY}`;
-        const footerUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Footer?key=${API_KEY}`;
-        const seoUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/SEO%20Settings?key=${API_KEY}`;
+        const urls = {
+            navbar: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Navbar?key=${API_KEY}`,
+            body: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Body?key=${API_KEY}`,
+            footer: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Footer?key=${API_KEY}`
+        };
 
         const fetchData = async (url) => {
             const response = await fetch(url);
@@ -74,116 +132,63 @@
         };
 
         const renderNavbar = async () => {
-            const data = await fetchData(navbarUrl);
+            const data = await fetchData(urls.navbar);
             const navbar = document.getElementById('navbar');
-            data.values.slice(1).forEach(row => {
-                const a = document.createElement('a');
-                a.href = row[1];
-                a.textContent = row[0];
-                navbar.appendChild(a);
-            });
-        };
-
-        const renderHeader = async () => {
-            const data = await fetchData(headerUrl);
-            const header = document.getElementById('header');
-            data.values.slice(1).forEach((row, index) => {
-                const slide = document.createElement('div');
-                slide.className = `carousel-slide ${index === 0 ? 'active' : ''}`;
-                slide.innerHTML = `
-                    <img src="${row[2]}" alt="${row[0]}">
-                    <div class="carousel-caption">
-                        <h1>${row[0]}</h1>
-                        <p>${row[1]}</p>
-                    </div>
-                `;
-                header.appendChild(slide);
-            });
-
-            let currentIndex = 0;
-            setInterval(() => {
-                const slides = document.querySelectorAll('.carousel-slide');
-                slides[currentIndex].classList.remove('active');
-                currentIndex = (currentIndex + 1) % slides.length;
-                slides[currentIndex].classList.add('active');
-            }, 5000);
-        };
-
-        const renderContent = async () => {
-            const data = await fetchData(contentUrl);
-            const content = document.getElementById('content');
-            const tagsDropdown = document.getElementById('filter-tags');
-            const searchInput = document.getElementById('search-input');
-
-            const renderPosts = (filteredPosts) => {
-                content.innerHTML = '';
-                filteredPosts.forEach(row => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.onclick = () => window.location.href = row[3];
-                    card.innerHTML = `
-                        <img src="${row[2]}" alt="${row[0]}">
-                        <div class="card-body">
-                            <a href="${row[3]}" class="card-title">${row[0]}</a>
-                            <p class="card-tag">Tag: ${row[4]}</p>
-                            <p class="card-description">${row[1]}</p>
-                        </div>
-                    `;
-                    content.appendChild(card);
-                });
-            };
-
-            const allPosts = data.values.slice(1);
-            const uniqueTags = [...new Set(allPosts.map(row => row[4]))];
-            uniqueTags.forEach(tag => {
-                const option = document.createElement('option');
-                option.value = tag;
-                option.textContent = tag;
-                tagsDropdown.appendChild(option);
-            });
-
-            const filterAndSearch = () => {
-                const selectedTag = tagsDropdown.value;
-                const searchTerm = searchInput.value.toLowerCase();
-                const filteredPosts = allPosts.filter(row => {
-                    const matchesTag = !selectedTag || row[4] === selectedTag;
-                    const matchesSearch = row[0].toLowerCase().includes(searchTerm) || row[4].toLowerCase().includes(searchTerm);
-                    return matchesTag && matchesSearch;
-                });
-                renderPosts(filteredPosts);
-            };
-
-            tagsDropdown.addEventListener('change', filterAndSearch);
-            searchInput.addEventListener('input', filterAndSearch);
-
-            renderPosts(allPosts);
+            navbar.innerHTML = data.values.slice(1).map(row => `
+                <a href="${row[1]}">${row[0]}</a>
+            `).join('');
         };
 
         const renderFooter = async () => {
-            const data = await fetchData(footerUrl);
-            const footer = document.getElementById('footer');
-            const row = data.values[1];
-            footer.style.backgroundColor = row[1];
-            footer.style.color = row[2];
-            footer.textContent = row[0];
+            const data = await fetchData(urls.footer);
+            document.getElementById('footer-address').innerText = data.values[1][0];
+            document.getElementById('footer-links').innerHTML = data.values.slice(2, -1).map(row => `
+                <a href="${row[1]}" target="_blank">${row[0]}</a>
+            `).join(' | ');
+            document.getElementById('footer-contact').innerText = data.values[data.values.length - 1][0];
         };
 
-        const applySEO = async () => {
-            const data = await fetchData(seoUrl);
-            const seoSettings = {};
-            data.values.forEach(row => seoSettings[row[0]] = row[1]);
+        const renderCards = async (searchTerm = '', selectedTag = '') => {
+            const data = await fetchData(urls.body);
+            const content = document.getElementById('content');
+            const filteredData = data.values.slice(1).filter(row => {
+                const matchesSearch = row[1].toLowerCase().includes(searchTerm.toLowerCase());
+                const matchesTag = selectedTag === '' || row[2] === selectedTag;
+                return matchesSearch && matchesTag;
+            });
 
-            document.title = seoSettings.meta_title;
-            document.querySelector('meta[name="description"]').setAttribute('content', seoSettings.meta_description);
-            document.getElementById('favicon').href = seoSettings.favicon;
+            content.innerHTML = filteredData.map(row => `
+                <div class="card">
+                    <img src="${row[0]}" alt="${row[1]}">
+                    <div class="card-body">
+                        <span class="card-tag">${row[2]}</span>
+                        <h3 class="card-title">${row[1]}</h3>
+                        <p class="card-description">${row[3]}</p>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        const populateTagDropdown = async () => {
+            const data = await fetchData(urls.body);
+            const tags = [...new Set(data.values.slice(1).map(row => row[2]))];
+            const tagSelect = document.getElementById('tag-select');
+            tagSelect.innerHTML += tags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
         };
 
         const init = async () => {
             await renderNavbar();
-            await renderHeader();
-            await renderContent();
             await renderFooter();
-            await applySEO();
+            await populateTagDropdown();
+            await renderCards();
+
+            document.getElementById('search-input').addEventListener('input', (e) => {
+                renderCards(e.target.value, document.getElementById('tag-select').value);
+            });
+
+            document.getElementById('tag-select').addEventListener('change', (e) => {
+                renderCards(document.getElementById('search-input').value, e.target.value);
+            });
         };
 
         init();
