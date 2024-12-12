@@ -76,9 +76,11 @@
             object-fit: cover;
             transition: opacity 1s ease-in-out;
             opacity: 0;
+            pointer-events: none; /* Disable pointer events for non-active slides */
         }
         .header-carousel .slide.active {
             opacity: 1;
+            pointer-events: auto; /* Enable pointer events for active slide */
         }
         .header-carousel .slide img {
             width: 100%;
@@ -234,23 +236,13 @@
                         </div>
                     </a>
                 `;
+                dots.innerHTML += `<div class="carousel-dot ${index === 0 ? 'active' : ''}"></div>`;
                 return slide;
             });
 
-            slides.forEach((_, index) => {
-                const dot = document.createElement('div');
-                dot.className = 'carousel-dot';
-                if (index === 0) dot.classList.add('active');
-                dot.addEventListener('click', () => {
-                    document.querySelector('.carousel-dot.active').classList.remove('active');
-                    document.querySelector('.slide.active').classList.remove('active');
-                    dot.classList.add('active');
-                    slides[index].classList.add('active');
-                });
-                dots.appendChild(dot);
-            });
-
-            carousel.append(...slides, dots);
+            carousel.append(...slides);
+            carousel.appendChild(dots);
+            setupAutoSlide();
         };
 
         const renderCards = async () => {
@@ -297,6 +289,22 @@
             footerAddress.textContent = data.values.slice(1)[0][0];  // Assuming the first cell contains address
             footerLinks.innerHTML = data.values.slice(1)[0].slice(1).map(link => `<a href="${link}">${link}</a>`).join(' | ');
             footerContact.textContent = data.values.slice(1)[0].slice(2).join(' | ');  // Contact information may be split across columns
+        };
+
+        const setupAutoSlide = () => {
+            const slides = document.querySelectorAll('.header-carousel .slide');
+            const dots = document.querySelectorAll('.carousel-dot');
+            let currentIndex = 0;
+
+            setInterval(() => {
+                slides[currentIndex].classList.remove('active');
+                dots[currentIndex].classList.remove('active');
+
+                currentIndex = (currentIndex + 1) % slides.length;
+
+                slides[currentIndex].classList.add('active');
+                dots[currentIndex].classList.add('active');
+            }, 5000);
         };
 
         const init = async () => {
