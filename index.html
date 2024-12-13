@@ -91,6 +91,10 @@ nav {
         font-size: 16px;
     }
 
+    .nav-links a:hover {
+        color: #3498db;
+    }
+
     .nav-search {
         display: flex;
         align-items: center;
@@ -135,63 +139,85 @@ nav {
     }
 
         
-        .header-carousel {
-            position: relative;
-            width: 100%;
-            height: 300px;
-            overflow: hidden;
-        }
-        .header-carousel .slide {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 1s ease-in-out;
-            opacity: 0;
-        }
-        .header-carousel .slide.active {
-            opacity: 1;
-        }
-        .header-carousel .slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .carousel-caption {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            color: #fff;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-        }
-        .carousel-caption h3 {
-            font-size: 24px;
-            margin: 0;
-        }
-        .carousel-caption p {
-            font-size: 18px;
-            margin: 5px 0 0;
-        }
+    .header-carousel {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+}
 
-        .carousel-dots {
-            display: flex;
-            justify-content: center;
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            gap: 10px;
-        }
-        .carousel-dot {
-            width: var(--dot-size);
-            height: var(--dot-size);
-            background-color: var(--dot-color);
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        .carousel-dot.active {
-            background-color: var(--dot-active-color);
-        }
+.carousel-slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none;
+}
+
+.carousel-slide.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.carousel-content {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.carousel-content h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.carousel-content h2 a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.carousel-content h2 a:hover {
+    color: #ff4757;
+}
+
+.carousel-content p {
+    margin: 5px 0 0;
+    font-size: 14px;
+}
+
+.carousel-dots {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+}
+
+.carousel-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.carousel-dot.active {
+    background-color: #ff4757;
+}
+
 
         .filter-search {
             display: flex;
@@ -415,6 +441,7 @@ nav {
         /* Search Bar in Menu */
         .nav-search {
             width: 100%;
+            margin-top: 10px;
         }
 
         .nav-toggle {
@@ -543,32 +570,90 @@ hamburger.addEventListener('click', () => {
     });
 };
 
-        const renderCarousel = async () => {
-            const data = await fetchData(urls.header);
-            const carousel = document.getElementById('header-carousel');
-            const dots = document.createElement('div');
-            dots.className = 'carousel-dots';
+const renderCarousel = async () => {
+    const data = await fetchData(urls.header);
+    const carousel = document.getElementById('header-carousel');
+    const dotsContainer = document.createElement('div');
+    dotsContainer.className = 'carousel-dots';
 
-            const slides = data.values.slice(1).map((row, index) => {
-                const slide = document.createElement('div');
-                slide.className = `slide ${index === 0 ? 'active' : ''}`;
-                slide.innerHTML = `
-                    <a href="${row[1]}" class="slide-link">
-                        <img src="${row[0]}" alt="${row[2]}">
-                        <div class="carousel-caption">
-                            <h3>${row[2]}</h3>
-                            <p>${row[3]}</p>
-                        </div>
-                    </a>
-                `;
-                dots.innerHTML += `<div class="carousel-dot ${index === 0 ? 'active' : ''}"></div>`;
-                return slide;
-            });
+    let currentIndex = 0;
+    let touchStartX = 0;
+    let touchEndX = 0;
 
-            carousel.append(...slides);
-            carousel.appendChild(dots);
-            setupAutoSlide();
-        };
+    const slides = data.values.slice(1).map((row, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'carousel-slide';
+        slide.style.backgroundImage = `url('${row[0]}')`;
+
+        const slideContent = document.createElement('div');
+        slideContent.className = 'carousel-content';
+        slideContent.innerHTML = `
+            <h2>
+                <a href="${row[3]}" target="_blank">${row[1]}</a>
+            </h2>
+            <p>${row[2]}</p>
+        `;
+
+        slide.appendChild(slideContent);
+        if (index === 0) slide.classList.add('active');
+        return slide;
+    });
+
+    const updateActiveSlide = (newIndex) => {
+        slides.forEach((slide, index) => {
+            if (index === newIndex) {
+                slide.classList.add('active');
+            } else {
+                slide.classList.remove('active');
+            }
+        });
+
+        dotsContainer.children[currentIndex].classList.remove('active');
+        currentIndex = newIndex;
+        dotsContainer.children[currentIndex].classList.add('active');
+    };
+
+    // Create dots
+    slides.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.className = 'carousel-dot';
+        if (index === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => {
+            updateActiveSlide(index);
+        });
+        dotsContainer.appendChild(dot);
+    });
+
+    // Append slides and dots to the carousel
+    carousel.append(...slides, dotsContainer);
+
+    // Touch events for swipe functionality
+    carousel.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+    });
+
+    carousel.addEventListener('touchmove', (e) => {
+        touchEndX = e.touches[0].clientX;
+    });
+
+    carousel.addEventListener('touchend', () => {
+        if (touchStartX - touchEndX > 50) {
+            // Swipe left
+            const nextIndex = (currentIndex + 1) % slides.length;
+            updateActiveSlide(nextIndex);
+        } else if (touchStartX - touchEndX < -50) {
+            // Swipe right
+            const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+            updateActiveSlide(prevIndex);
+        }
+    });
+
+    // Auto-slide functionality
+    setInterval(() => {
+        const nextIndex = (currentIndex + 1) % slides.length;
+        updateActiveSlide(nextIndex);
+    }, 5000); // 5 seconds
+};
 
         const renderCards = async () => {
     const data = await fetchData(urls.body);
