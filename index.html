@@ -54,82 +54,83 @@ nav {
     z-index: 1000;
 }
 
-/* Logo Section */
-nav .logo {
-    display: flex;
-    align-items: center;
-}
+#navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: rgba(51, 51, 51, 0.9); /* Mulai dengan opacity 0.9 */
+        padding: 10px 20px;
+        color: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        transition: background-color 0.3s, opacity 0.3s;
+    }
 
-nav .logo img {
-    height: var(--logo-height, 40px);
-    width: auto;
-}
+    /* Navbar scroll efek */
+    #navbar.scrolled {
+        background-color: rgba(51, 51, 51, 0.7); /* Kurangi opacity saat di-scroll */
+    }
 
-/* Navigation Links */
-nav .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
+    .logo img {
+        height: 40px;
+    }
 
-nav .nav-links a {
-    text-decoration: none;
-    color: inherit;
-    font-size: var(--navbar-font-size, 16px);
-    font-family: var(--navbar-font-family, Arial);
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
+    .nav-links {
+        display: flex;
+        gap: 15px;
+    }
 
-nav .nav-links a:hover {
-    background-color: var(--navbar-hover-bg, #374151);
-}
+    .nav-links a {
+        text-decoration: none;
+        color: #fff;
+        font-size: 16px;
+    }
 
-/* Search Bar */
-nav .nav-search {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+    .nav-search {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
 
-nav .nav-search input {
-    padding: 8px 12px;
-    font-size: var(--search-font-size, 14px);
-    border: 1px solid var(--search-border-color, #d1d5db);
-    border-radius: 5px;
-    outline: none;
-    transition: border-color 0.3s ease;
-}
+    .nav-search input {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        width: 200px;
+    }
 
-nav .nav-search input:focus {
-    border-color: var(--search-focus-border, #3b82f6);
-}
+    .nav-search button {
+        padding: 8px 12px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
 
-nav .nav-search button {
-    padding: 8px 16px;
-    background-color: var(--search-btn-bg, #3b82f6);
-    color: var(--search-btn-font, #ffffff);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+    .nav-search button:hover {
+        background-color: #0056b3;
+    }
 
-nav .nav-search button:hover {
-    background-color: var(--search-btn-hover-bg, #2563eb);
-}
+    /* Menu toggle (hamburger) */
+    .nav-toggle {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+    }
 
+    .nav-toggle span {
+        display: block;
+        width: 25px;
+        height: 3px;
+        background-color: #fff;
+    }
 
-        .navbar-links {
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .navbar-search {
-            margin-top: 10px;
-        }
+        
         .header-carousel {
             position: relative;
             width: 100%;
@@ -337,6 +338,37 @@ nav .nav-search button:hover {
     }
 
         @media (max-width: 768px) {
+            
+        .nav-links {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #444;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        .nav-links a {
+            padding: 10px 0;
+            border-bottom: 1px solid #555;
+        }
+
+        .nav-links.show {
+            display: flex;
+        }
+
+        .nav-search {
+            display: none;
+        }
+
+        
+
+        #navbar {
+            flex-wrap: wrap;
+        }
             .filter-search input, .filter-search select {
                 width: calc(100% - 20px);
                 max-width: none;
@@ -360,6 +392,11 @@ nav .nav-search button:hover {
     <nav id="navbar">
         <div class="logo">
             <img src="logo.png" alt="Logo" id="logo-image">
+        </div>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
         <div class="nav-links" id="nav-links"></div>
         <div class="nav-search">
@@ -404,9 +441,36 @@ nav .nav-search button:hover {
         };
 
         const fetchData = async (url) => {
-            const response = await fetch(url);
-            return response.json();
-        };
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Failed to fetch data');
+        return response.json();
+    } catch (error) {
+        console.error('Error:', error);
+        return null; // Return null to handle errors gracefully
+    }
+};
+
+// Tangkap elemen tombol hamburger dan navbar links
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('nav-links');
+
+// Tambahkan event listener ke tombol hamburger
+hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active'); // Toggle animasi tombol
+    navLinks.classList.toggle('active'); // Toggle menu links
+});
+
+const navbar = document.getElementById('navbar');
+
+// Tambahkan event listener untuk scroll
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 0) {
+        navbar.classList.add('scrolled'); // Tambahkan efek opacity berkurang
+    } else {
+        navbar.classList.remove('scrolled'); // Kembalikan ke keadaan awal
+    }
+});
 
         const renderNavbar = async () => {
     const data = await fetchData(urls.navbar);
@@ -463,44 +527,69 @@ nav .nav-search button:hover {
         };
 
         const renderCards = async () => {
-            const data = await fetchData(urls.body);
-            const content = document.getElementById('content');
-            const searchInput = document.getElementById('search-input');
-            const tagFilter = document.getElementById('tag-filter');
+    const data = await fetchData(urls.body);
+    const content = document.getElementById('content');
+    const tagFilter = document.getElementById('tag-filter');
+    const searchBar = document.getElementById('search-bar');
+    const searchButton = document.getElementById('search-button');
 
-            const allTags = [...new Set(data.values.slice(1).map(row => row[2]))];
-            tagFilter.innerHTML += allTags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
+    // Ambil semua tag unik
+    const allTags = [...new Set(data.values.slice(1).flatMap(row => row[2].split(',').map(tag => tag.trim())))];
+    tagFilter.innerHTML += allTags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
 
-            const renderFiltered = () => {
-                const searchValue = searchInput.value.toLowerCase();
-                const filterValue = tagFilter.value;
+    // Fungsi untuk merender data yang difilter
+    const renderFiltered = (searchValue = '', filterValue = '') => {
+        const filteredData = data.values.slice(1).filter(row => {
+            const titleMatch = row[1].toLowerCase().includes(searchValue); // Pencarian judul
+            const descriptionMatch = row[3].toLowerCase().includes(searchValue); // Pencarian deskripsi
+            const tagMatch = row[2].toLowerCase().includes(searchValue); // Pencarian tag
+            const filterMatch = filterValue === '' || row[2].split(',').map(tag => tag.trim()).includes(filterValue); // Filter tag
+            return (titleMatch || descriptionMatch || tagMatch) && filterMatch;
+        });
 
-                const filteredData = data.values.slice(1).filter(row =>
-                    (row[1].toLowerCase().includes(searchValue) || row[2].includes(searchValue)) &&
-                    (filterValue === '' || row[2] === filterValue)
-                );
-
-                content.innerHTML = data.values.slice(1).map(row => {
-                const tags = row[2].split(',').map(tag => `<span class="card-tag">${tag.trim()}</span>`).join('');
-                return `
-                    <div class="card">
-                        <img src="${row[0]}" alt="${row[1]}">
-                        <div class="card-body">
-                            <div class="card-tags">${tags}</div>
-                            <h3 class="card-title">
-                                <a href="${row[4]}" target="_blank">${row[1]}</a>
-                            </h3>
-                            <p class="card-description">${row[3]}</p>
-                        </div>
+        content.innerHTML = filteredData.map(row => {
+            const tags = row[2]
+                .split(',')
+                .map(tag => `<span class="card-tag">${tag.trim()}</span>`)
+                .join('');
+            return `
+                <div class="card">
+                    <img src="${row[0]}" alt="${row[1]}">
+                    <div class="card-body">
+                        <div class="card-tags">${tags}</div>
+                        <h3 class="card-title">
+                            <a href="${row[4]}" target="_blank">${row[1]}</a>
+                        </h3>
+                        <p class="card-description">${row[3]}</p>
                     </div>
-                `;
-            }).join('');
-            };
+                </div>
+            `;
+        }).join('');
+    };
 
-            searchInput.addEventListener('input', renderFiltered);
-            tagFilter.addEventListener('change', renderFiltered);
-            renderFiltered();
-        };
+    // Event untuk pencarian di navbar
+    searchButton.addEventListener('click', () => {
+        const searchValue = searchBar.value.toLowerCase();
+        const filterValue = tagFilter.value;
+        renderFiltered(searchValue, filterValue);
+    });
+
+    searchBar.addEventListener('input', () => {
+        const searchValue = searchBar.value.toLowerCase();
+        const filterValue = tagFilter.value;
+        renderFiltered(searchValue, filterValue);
+    });
+
+    tagFilter.addEventListener('change', () => {
+        const searchValue = searchBar.value.toLowerCase();
+        const filterValue = tagFilter.value;
+        renderFiltered(searchValue, filterValue);
+    });
+
+    renderFiltered(); // Render awal
+};
+
+
 
         const renderFooter = async () => {
         const data = await fetchData(urls.footer);
@@ -556,21 +645,30 @@ nav .nav-search button:hover {
         `;
     };
 
-        const setupAutoSlide = () => {
-            const slides = document.querySelectorAll('.header-carousel .slide');
-            const dots = document.querySelectorAll('.carousel-dot');
-            let currentIndex = 0;
+    
+    const fetchDataWithCache = async (url, key) => {
+    const cachedData = localStorage.getItem(key);
+    if (cachedData) return JSON.parse(cachedData);
 
-            setInterval(() => {
-                slides[currentIndex].classList.remove('active');
-                dots[currentIndex].classList.remove('active');
+    const data = await fetchData(url);
+    if (data) localStorage.setItem(key, JSON.stringify(data));
+    return data;
+};
 
-                currentIndex = (currentIndex + 1) % slides.length;
+const setupAutoSlide = () => {
+    let currentIndex = 0;
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.carousel-dot');
 
-                slides[currentIndex].classList.add('active');
-                dots[currentIndex].classList.add('active');
-            }, 5000);
-        };
+    setInterval(() => {
+        slides[currentIndex].classList.remove('active');
+        dots[currentIndex].classList.remove('active');
+        currentIndex = (currentIndex + 1) % slides.length;
+        slides[currentIndex].classList.add('active');
+        dots[currentIndex].classList.add('active');
+    }, 5000); // Auto-slide every 5 seconds
+};
+
 
         const init = async () => {
             await renderNavbar();
