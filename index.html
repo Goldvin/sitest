@@ -22,6 +22,11 @@
             --body-font-size: 16px;
             --body-font-family: 'Arial', sans-serif;
 
+            --card-hover-bg: #eaf4fc;
+            --card-hover-border: #3498db;
+
+            --title-hover-color: #ff6347;
+
             --dot-color: #ffffff;
             --dot-active-color: #ff4757;
             --dot-size: 10px;
@@ -35,34 +40,96 @@
             color: var(--body-font);
         }
 
-        nav {
-            display: flex;
-            justify-content: space-between;
+        /* General Navbar Styling */
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--navbar-bg, #1f2937);
+    color: var(--navbar-font, #ffffff);
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Logo Section */
+nav .logo {
+    display: flex;
+    align-items: center;
+}
+
+nav .logo img {
+    height: var(--logo-height, 40px);
+    width: auto;
+}
+
+/* Navigation Links */
+nav .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+nav .nav-links a {
+    text-decoration: none;
+    color: inherit;
+    font-size: var(--navbar-font-size, 16px);
+    font-family: var(--navbar-font-family, Arial);
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+nav .nav-links a:hover {
+    background-color: var(--navbar-hover-bg, #374151);
+}
+
+/* Search Bar */
+nav .nav-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+nav .nav-search input {
+    padding: 8px 12px;
+    font-size: var(--search-font-size, 14px);
+    border: 1px solid var(--search-border-color, #d1d5db);
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+nav .nav-search input:focus {
+    border-color: var(--search-focus-border, #3b82f6);
+}
+
+nav .nav-search button {
+    padding: 8px 16px;
+    background-color: var(--search-btn-bg, #3b82f6);
+    color: var(--search-btn-font, #ffffff);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+nav .nav-search button:hover {
+    background-color: var(--search-btn-hover-bg, #2563eb);
+}
+
+
+        .navbar-links {
+            flex-direction: column;
             align-items: center;
-            background-color: var(--navbar-bg);
-            color: var(--navbar-font);
-            padding: 10px 20px;
-        }
-        nav .nav-links a {
-            text-decoration: none;
-            color: inherit;
-            font-size: var(--navbar-font-size);
-            font-family: var(--navbar-font-family);
-            margin: 0 10px;
-        }
-
-        .filter-search {
-            display: flex;
             gap: 10px;
-            padding: 20px;
-        }
-        .filter-search input, .filter-search select {
-            padding: 10px;
-            font-size: var(--body-font-size);
-            border: 1px solid #ccc;
-            border-radius: 4px;
         }
 
+        .navbar-search {
+            margin-top: 10px;
+        }
         .header-carousel {
             position: relative;
             width: 100%;
@@ -76,11 +143,9 @@
             object-fit: cover;
             transition: opacity 1s ease-in-out;
             opacity: 0;
-            pointer-events: none; /* Disable pointer events for non-active slides */
         }
         .header-carousel .slide.active {
             opacity: 1;
-            pointer-events: auto; /* Enable pointer events for active slide */
         }
         .header-carousel .slide img {
             width: 100%;
@@ -123,6 +188,23 @@
             background-color: var(--dot-active-color);
         }
 
+        .filter-search {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+        .filter-search input, .filter-search select {
+            padding: 10px;
+            font-size: var(--body-font-size);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 300px;
+        }
+
         .content {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -136,6 +218,13 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            background-color: var(--card-hover-bg);
+            border-color: var(--card-hover-border);
         }
         .card img {
             width: 100%;
@@ -149,6 +238,20 @@
             font-size: 18px;
             margin: 0 0 10px;
         }
+        .card-title a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .card-title a:hover {
+            color: var(--title-hover-color);
+        }
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
         .card-tag {
             display: inline-block;
             background-color: #3498db;
@@ -156,7 +259,6 @@
             font-size: 12px;
             padding: 2px 8px;
             border-radius: 4px;
-            margin-bottom: 10px;
         }
         .card-description {
             font-size: 14px;
@@ -164,34 +266,130 @@
         }
 
         footer {
-            background-color: var(--footer-bg);
-            color: var(--footer-font);
-            font-size: var(--footer-font-size);
-            text-align: center;
-            padding: 20px;
-        }
-        footer .footer-section {
-            margin: 10px 0;
+        background-color: var(--footer-bg, #1e1e1e);
+        color: var(--footer-font, #ffffff);
+        padding: 40px 20px;
+        font-family: var(--footer-font-family, 'Arial', sans-serif);
+    }
+
+    .footer-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .footer-section {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .footer-section h4 {
+        font-size: 18px;
+        margin-bottom: 10px;
+        color: var(--footer-section-title-color, #f1c40f);
+    }
+
+    .footer-section p {
+        margin: 0 0 10px;
+        font-size: var(--footer-font-size, 14px);
+    }
+
+    .footer-section ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-section ul li {
+        margin: 5px 0;
+    }
+
+    .footer-section ul li a {
+        color: var(--footer-link-color, #bdc3c7);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .footer-section ul li a:hover {
+        color: var(--footer-link-hover-color, #f1c40f);
+    }
+
+    .footer-section a {
+        color: var(--footer-link-color, #bdc3c7);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .footer-section a:hover {
+        color: var(--footer-link-hover-color, #f1c40f);
+    }
+
+    .footer-bottom {
+        text-align: center;
+        margin-top: 20px;
+        border-top: 1px solid #444;
+        padding-top: 10px;
+        font-size: var(--footer-bottom-font-size, 12px);
+        color: var(--footer-bottom-font-color, #7f8c8d);
+    }
+
+        @media (max-width: 768px) {
+            .filter-search input, .filter-search select {
+                width: calc(100% - 20px);
+                max-width: none;
+            }
+            .footer-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .footer-section {
+                text-align: center;
+            }
+
+            .footer-bottom {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
 <body>
-    <nav>
-        <div class="nav-brand">My Website</div>
-        <div class="nav-links" id="navbar"></div>
+    <nav id="navbar">
+        <div class="logo">
+            <img src="logo.png" alt="Logo" id="logo-image">
+        </div>
+        <div class="nav-links" id="nav-links"></div>
+        <div class="nav-search">
+            <input type="text" id="search-bar" placeholder="Search posts...">
+            <button id="search-button">Search</button>
+        </div>
     </nav>
+    <div class="header-carousel" id="header-carousel"></div>
     <div class="filter-search">
         <input type="text" id="search-input" placeholder="Search by title or tags...">
         <select id="tag-filter">
             <option value="">Filter by tag</option>
         </select>
     </div>
-    <div class="header-carousel" id="header-carousel"></div>
     <div class="content" id="content"></div>
     <footer>
-        <div class="footer-section" id="footer-address"></div>
-        <div class="footer-section" id="footer-links"></div>
-        <div class="footer-section" id="footer-contact"></div>
+        <div class="footer-container">
+            <div class="footer-section" id="footer-address">
+                <h4>Alamat</h4>
+            </div>
+            <div class="footer-section" id="footer-links">
+                <h4>Sitelink</h4>
+            </div>
+            <div class="footer-section" id="footer-contact">
+                <h4>Hubungi Kami</h4>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Dynamic Website. Semua Hak Dilindungi.</p>
+        </div>
     </footer>
 
     <script>
@@ -211,12 +409,31 @@
         };
 
         const renderNavbar = async () => {
-            const data = await fetchData(urls.navbar);
-            const navbar = document.getElementById('navbar');
-            navbar.innerHTML = data.values.slice(1).map(row => `
-                <a href="${row[1]}">${row[0]}</a>
-            `).join('');
-        };
+    const data = await fetchData(urls.navbar);
+    const navLinks = document.getElementById('nav-links');
+    const logoImage = document.getElementById('logo-image');
+
+    const rows = data.values.slice(1); // Skip header row
+
+    // Clear Existing Content
+    navLinks.innerHTML = '';
+
+    // Set Logo
+    const logoRow = rows.find(row => row[0] === 'Logo');
+    if (logoRow) {
+        logoImage.src = logoRow[1];
+        logoImage.alt = logoRow[2] || 'Logo';
+    }
+
+    // Add Navigation Links
+    rows.filter(row => row[0] === 'Link').forEach(linkRow => {
+        const link = document.createElement('a');
+        link.href = linkRow[2];
+        link.textContent = linkRow[1];
+        link.target = '_blank';
+        navLinks.appendChild(link);
+    });
+};
 
         const renderCarousel = async () => {
             const data = await fetchData(urls.header);
@@ -263,16 +480,21 @@
                     (filterValue === '' || row[2] === filterValue)
                 );
 
-                content.innerHTML = filteredData.map(row => `
+                content.innerHTML = data.values.slice(1).map(row => {
+                const tags = row[2].split(',').map(tag => `<span class="card-tag">${tag.trim()}</span>`).join('');
+                return `
                     <div class="card">
                         <img src="${row[0]}" alt="${row[1]}">
                         <div class="card-body">
-                            <h2 class="card-title">${row[1]}</h2>
-                            <div class="card-tag">${row[2]}</div>
+                            <div class="card-tags">${tags}</div>
+                            <h3 class="card-title">
+                                <a href="${row[4]}" target="_blank">${row[1]}</a>
+                            </h3>
                             <p class="card-description">${row[3]}</p>
                         </div>
                     </div>
-                `).join('');
+                `;
+            }).join('');
             };
 
             searchInput.addEventListener('input', renderFiltered);
@@ -281,15 +503,58 @@
         };
 
         const renderFooter = async () => {
-            const data = await fetchData(urls.footer);
-            const footerAddress = document.getElementById('footer-address');
-            const footerLinks = document.getElementById('footer-links');
-            const footerContact = document.getElementById('footer-contact');
+        const data = await fetchData(urls.footer);
+        const rows = data.values.slice(1); // Skip header row
 
-            footerAddress.textContent = data.values.slice(1)[0][0];  // Assuming the first cell contains address
-            footerLinks.innerHTML = data.values.slice(1)[0].slice(1).map(link => `<a href="${link}">${link}</a>`).join(' | ');
-            footerContact.textContent = data.values.slice(1)[0].slice(2).join(' | ');  // Contact information may be split across columns
-        };
+        const addressSection = document.getElementById('footer-address');
+        const sitelinkSection = document.getElementById('footer-links');
+        const contactSection = document.getElementById('footer-contact');
+
+        // Clear existing content
+        addressSection.innerHTML = '';
+        sitelinkSection.innerHTML = '';
+        contactSection.innerHTML = '';
+
+        // Populate Address Section
+        const addressTitle = rows.find(row => row[0] === 'Address' && row[1] === 'Title')[2];
+        const addressContent = rows.find(row => row[0] === 'Address' && row[1] === 'Content')[2];
+        addressSection.innerHTML = `
+            <h4>${addressTitle}</h4>
+            <p>${addressContent}</p>
+        `;
+
+        // Populate Sitelink Section
+        const sitelinkTitle = rows.find(row => row[0] === 'Sitelink' && row[1] === 'Title')[2];
+        const sitelinks = rows.filter(row => row[0] === 'Sitelink' && row[1].includes('Link Text'));
+        sitelinkSection.innerHTML = `<h4>${sitelinkTitle}</h4><ul></ul>`;
+        const sitelinkList = sitelinkSection.querySelector('ul');
+        sitelinks.forEach(linkRow => {
+            const text = linkRow[2];
+            const urlRow = rows.find(r => r[0] === 'Sitelink' && r[1] === linkRow[1].replace('Text', 'URL'));
+            const url = urlRow ? urlRow[2] : '#';
+            sitelinkList.innerHTML += `<li><a href="${url}" target="_blank">${text}</a></li>`;
+        });
+
+        // Populate Contact Section
+        const contactTitle = rows.find(row => row[0] === 'Contact' && row[1] === 'Title')[2];
+        const emailLabel = rows.find(row => row[0] === 'Contact' && row[1] === 'Email Label')[2];
+        const emailAddress = rows.find(row => row[0] === 'Contact' && row[1] === 'Email Address')[2];
+        const phoneLabel = rows.find(row => row[0] === 'Contact' && row[1] === 'Phone Label')[2];
+        const phoneNumber = rows.find(row => row[0] === 'Contact' && row[1] === 'Phone Number')[2];
+        const socialLabel = rows.find(row => row[0] === 'Contact' && row[1] === 'Social Label')[2];
+        const facebookLink = rows.find(row => row[0] === 'Contact' && row[1] === 'Social Facebook')[2];
+        const instagramLink = rows.find(row => row[0] === 'Contact' && row[1] === 'Social Instagram')[2];
+
+        contactSection.innerHTML = `
+            <h4>${contactTitle}</h4>
+            <p>${emailLabel}: <a href="mailto:${emailAddress}">${emailAddress}</a></p>
+            <p>${phoneLabel}: <a href="tel:${phoneNumber}">${phoneNumber}</a></p>
+            <p>${socialLabel}: 
+                <a href="${facebookLink}" target="_blank">Facebook</a> | 
+                <a href="${instagramLink}" target="_blank">Instagram</a>
+            </p>
+        `;
+    };
 
         const setupAutoSlide = () => {
             const slides = document.querySelectorAll('.header-carousel .slide');
