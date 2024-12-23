@@ -651,11 +651,22 @@ footer {
         max-width: none;
     }
 
+    .services-slider {
+        display: flex;
+        overflow-x: hidden; /* Mencegah scroll horizontal */
+        scroll-snap-type: x mandatory; /* Membuat elemen snap saat di-scroll */
+    }
+
     .services-slider .card {
-        flex: 0 0 calc(100% - 16px); /* Jarak antar kartu */
-        margin: 0; /* Tidak ada margin antar kartu untuk mobile */
-        max-width: calc(100% - 32px); /* Lebih sempit agar ada ruang di kiri dan kanan */
-   
+        flex: 0 0 100%; /* Setiap kartu mengambil 100% lebar slider */
+        scroll-snap-align: center; /* Snap ke tengah saat geser */
+        margin-right: 10px; /* Opsional: Tambahkan spasi antar kartu */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Opsional: Bayangan untuk kartu */
+    }
+
+    .services-slider .card img {
+        width: 100%; /* Gambar memenuhi lebar kartu */
+        border-radius: 8px; /* Opsional: Sudut gambar melengkung */
     }
 
     .slider-btn {

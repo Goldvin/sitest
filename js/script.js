@@ -314,34 +314,19 @@ const fetchServicesData = async () => {
             tags: (row[5] || "").split(',').map(tag => tag.trim()), // Default empty array jika tidak ada tags
         }));
     } catch (error) {
-        console.error('Error fetching services data:', error);
+        console.error("Error fetching services data:", error);
         return [];
     }
 };
 
-
 const renderServices = async () => {
     const servicesData = await fetchServicesData();
     const slider = document.querySelector(".services-slider");
-    const tagFilter = document.querySelector("#tag-filter"); // Dropdown untuk tag
-    let selectedTag = ""; // Simpan tag yang dipilih
 
-    // Render filter tag
-    const uniqueTags = [...new Set(servicesData.flatMap(service => service.tags))];
-    tagFilter.innerHTML = `
-        <option value="">All</option>
-        ${uniqueTags.map(tag => `<option value="${tag}">${tag}</option>`).join("")}
-    `;
-
-    // Fungsi untuk merender kartu layanan berdasarkan tag
-    const renderFilteredServices = (tag) => {
-        const filteredServices = tag
-            ? servicesData.filter(service => service.tags.includes(tag))
-            : servicesData;
-
-        slider.innerHTML = filteredServices
-            .map(
-                (service) => `
+    // Render semua layanan tanpa filter tag
+    slider.innerHTML = servicesData
+        .map(
+            (service) => `
             <div class="card">
                 <img src="${service.image}" alt="${service.title}">
                 <h3>${service.title}</h3>
@@ -355,18 +340,8 @@ const renderServices = async () => {
                 </div>
             </div>
         `
-            )
-            .join("");
-    };
-
-    // Render awal tanpa filter
-    renderFilteredServices(selectedTag);
-
-    // Event listener untuk perubahan tag
-    tagFilter.addEventListener("change", (event) => {
-        selectedTag = event.target.value;
-        renderFilteredServices(selectedTag);
-    });
+        )
+        .join("");
 };
 
 
