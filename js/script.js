@@ -357,7 +357,7 @@ const initSlider = () => {
     }
 
     const isMobile = window.innerWidth <= 768;
-    const cardWidth = isMobile
+    let cardWidth = isMobile
         ? slider.offsetWidth // Satu kartu untuk mobile
         : slider.offsetWidth / 3; // Tiga kartu untuk desktop
     let currentIndex = 0;
@@ -368,6 +368,7 @@ const initSlider = () => {
 
     const updateSliderPosition = () => {
         slider.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+        slider.style.transition = "transform 0.3s ease-in-out"; // Tambahkan transisi
     };
 
     const startAutoSlide = () => {
@@ -446,16 +447,14 @@ const initSlider = () => {
     window.addEventListener("resize", () => {
         stopAutoSlide();
         const isNowMobile = window.innerWidth <= 768;
-        const newCardWidth = isNowMobile
+        cardWidth = isNowMobile
             ? slider.offsetWidth
             : slider.offsetWidth / 3;
-        cards.forEach(card => (card.style.flex = `0 0 ${newCardWidth}px`));
+        cards.forEach(card => (card.style.flex = `0 0 ${cardWidth}px`));
         updateSliderPosition();
         startAutoSlide();
     });
 };
-
-
 
 document.addEventListener("DOMContentLoaded", async () => {
     await renderServices(); // Tunggu hingga kartu selesai dirender

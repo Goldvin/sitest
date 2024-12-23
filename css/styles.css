@@ -653,20 +653,11 @@ footer {
 
     .services-slider {
         display: flex;
-        overflow-x: hidden; /* Mencegah scroll horizontal */
-        scroll-snap-type: x mandatory; /* Membuat elemen snap saat di-scroll */
+        overflow: hidden; /* Sembunyikan kartu di luar viewport */
     }
 
     .services-slider .card {
-        flex: 0 0 100%; /* Setiap kartu mengambil 100% lebar slider */
-        scroll-snap-align: center; /* Snap ke tengah saat geser */
-        margin-right: 10px; /* Opsional: Tambahkan spasi antar kartu */
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Opsional: Bayangan untuk kartu */
-    }
-
-    .services-slider .card img {
-        width: 100%; /* Gambar memenuhi lebar kartu */
-        border-radius: 8px; /* Opsional: Sudut gambar melengkung */
+        flex: 0 0 100%; /* Setiap kartu memakan 100% lebar slider */
     }
 
     .slider-btn {
