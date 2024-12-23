@@ -358,9 +358,13 @@ nav {
 }
 
 .services-section {
-    margin: 20px;
+    margin: 20px auto;
     text-align: center;
     position: relative;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* Latar belakang gradasi lembut */
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Bayangan lembut */
 }
 
 .services-container {
@@ -372,48 +376,106 @@ nav {
 .services-slider {
     display: flex;
     gap: 20px;
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.5s ease-in-out; /* Perubahan lebih halus */
 }
 
 .services-slider .card {
-        flex: 0 0 calc(33.33% - 20px);
+    flex: 0 0 calc(33.33% - 20px);
+    background-color: #fff; /* Latar belakang putih */
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Tambahkan bayangan lembut */
+    overflow: hidden; /* Pastikan elemen anak tidak keluar */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.services-slider .card:hover {
+    transform: translateY(-10px); /* Efek melayang */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Bayangan lebih intens saat hover */
 }
 
 .services-slider .card img {
     max-width: 100%;
-    border-radius: 8px;
+    border-radius: 12px 12px 0 0; /* Hanya bagian atas yang melengkung */
 }
 
 .services-slider .card h3 {
-    margin: 10px 0;
-    font-size: 18px;
+    margin: 15px 0 10px;
+    font-size: 20px;
+    color: #222; /* Warna teks yang lebih solid */
+    font-weight: 600; /* Teks lebih tebal untuk judul */
+    letter-spacing: 0.5px; /* Memberikan sedikit jarak antar huruf */
+    text-transform: capitalize; /* Setiap kata dimulai dengan huruf besar */
+    text-align: center; /* Judul di tengah */
 }
 
 .services-slider .card p {
-    margin: 10px 0;
+    margin: 10px 15px;
     font-size: 14px;
-    color: #666;
+    color: #555; /* Warna abu-abu lembut untuk deskripsi */
+    line-height: 1.8; /* Spasi antar baris lebih luas untuk kemudahan baca */
+    text-align: justify; /* Teks rata kanan-kiri untuk tampilan lebih rapi */
+    font-family: 'Roboto', sans-serif; /* Font modern */
 }
 
 .services-slider .card ul {
-    margin: 10px 0;
+    margin: 10px 15px;
     padding-left: 20px;
     font-size: 14px;
-    color: #666;
+    color: #444; /* Warna lebih gelap dibanding deskripsi */
+    line-height: 1.6;
+    list-style: none; /* Hilangkan bullet points */
+}
+
+.services-slider .card ul li {
+    position: relative;
+    padding-left: 25px;
+    margin-bottom: 10px;
+}
+
+.services-slider .card ul li::before {
+    content: '✔'; /* Simbol checklist untuk setiap item */
+    position: absolute;
+    left: 0;
+    color: #4CAF50; /* Warna hijau modern untuk checklist */
+    font-size: 14px;
+}
+
+.services-slider .card .card-tags {
+    margin-bottom: 10px;
+    display: flex;
+    gap: 5px;
+    justify-content: center; /* Tag di tengah */
+    flex-wrap: wrap; /* Jika tag terlalu banyak, akan turun ke baris berikutnya */
+}
+
+.services-slider .card .card-tags span {
+    background-color: #f0f0f0; /* Latar belakang abu-abu terang */
+    color: #555; /* Warna teks tag */
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 15px; /* Membuat tag berbentuk oval */
+    font-weight: 500;
+    text-transform: capitalize; /* Teks diawali dengan huruf besar */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sedikit bayangan untuk tag */
 }
 
 .slider-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.7); /* Warna tombol lebih gelap */
     color: white;
     border: none;
-    padding: 10px 15px;
+    padding: 12px 18px;
+    border-radius: 50%; /* Tombol berbentuk bulat */
     cursor: pointer;
     z-index: 10;
+    transition: background-color 0.3s ease;
 }
 
+.slider-btn:hover {
+    background-color: rgba(0, 0, 0, 0.9); /* Perubahan warna saat hover */
+}
 
 .slider-btn.prev-btn {
     left: 10px;
@@ -421,7 +483,7 @@ nav {
 
 .slider-btn.next-btn {
     right: 10px;
-} 
+}
 
 footer {
     background-color: var(--footer-bg, #1e1e1e);
@@ -581,13 +643,6 @@ footer {
 
     #navbar {
         flex-wrap: wrap;
-    }
-
-    .services-slider {
-        transition: transform 0.5s ease-in-out;
-        width: 100%; /* Pastikan slider mengambil lebar penuh */
-        justify-content: space-between; /* Space di kanan dan kiri card */
-        transform: translateX(-100%); /* Geser 1 kartu ke kiri */
     }
 
     .filter-search input,

@@ -145,53 +145,48 @@ const renderCarousel = async () => {
 
 const renderCards = async () => {
     const data = await fetchData(urls.body);
-    const content = document.getElementById('content');
-    const tagFilter = document.getElementById('tag-filter');
-    const searchBar = document.getElementById('search-bar');
-    const searchButton = document.getElementById('search-button');
-    const paginationContainer = document.getElementById('pagination');
+    const content = document.getElementById("content");
+    const tagFilter = document.getElementById("tag-filter");
+    const searchBar = document.getElementById("search-bar");
+    const searchButton = document.getElementById("search-button");
+    const paginationContainer = document.getElementById("pagination");
 
-    const maxCardsPerPageMobile = 3; // Batas card per halaman pada device mobile
-    let currentPage = 1;
+    const maxCardsPerPageMobile = 3; // Batas kartu per halaman pada perangkat mobile
+    let currentPage = 1; // Menyimpan halaman saat ini
 
-    // Get all unique tags
-    const allTags = [...new Set(data.values.slice(1).flatMap(row => row[2].split(',').map(tag => tag.trim())))];
-    tagFilter.innerHTML += allTags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
+    // Dapatkan semua tag unik
+    const allTags = [...new Set(data.values.slice(1).flatMap(row => row[2].split(",").map(tag => tag.trim())))];
+    tagFilter.innerHTML += allTags.map(tag => `<option value="${tag}">${tag}</option>`).join("");
 
-    // Fungsi untuk menentukan apakah menggunakan pagination
     const isMobile = () => window.innerWidth <= 768;
 
-    
+    // Fungsi untuk merender data yang difilter
+    const renderFiltered = (searchValue = "", filterValue = "", page = 1) => {
+        const isMobileView = isMobile();
+        const cardsPerPage = isMobileView ? 3 : 6; // 3 kartu di mobile, 6 kartu di desktop
 
-    // Fungsi untuk render data yang difilter
-    const renderFiltered = (searchValue = '', filterValue = '', currentPage = 1) => {
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
-        const cardsPerPage = isMobile ? 3 : 6; // 3 kartu untuk mobile, 6 kartu untuk desktop
-    
         const filteredData = data.values.slice(1).filter(row => {
-            const titleMatch = row[1].toLowerCase().includes(searchValue); // Title search
-            const descriptionMatch = row[3].toLowerCase().includes(searchValue); // Description search
-            const tagMatch = row[2].toLowerCase().includes(searchValue); // Tag search
-            const filterMatch = filterValue === '' || row[2].split(',').map(tag => tag.trim()).includes(filterValue); // Tag filter
+            const titleMatch = row[1].toLowerCase().includes(searchValue);
+            const descriptionMatch = row[3].toLowerCase().includes(searchValue);
+            const tagMatch = row[2].toLowerCase().includes(searchValue);
+            const filterMatch = filterValue === "" || row[2].split(",").map(tag => tag.trim()).includes(filterValue);
             return (titleMatch || descriptionMatch || tagMatch) && filterMatch;
         });
-    
-        // Pagination logic
+
         const totalPages = Math.ceil(filteredData.length / cardsPerPage);
-        const startIndex = (currentPage - 1) * cardsPerPage;
+        const startIndex = (page - 1) * cardsPerPage;
         const paginatedData = filteredData.slice(startIndex, startIndex + cardsPerPage);
-    
+
         content.innerHTML = paginatedData.map(row => {
             const tags = row[2]
-                .split(',')
+                .split(",")
                 .map(tag => `<span class="card-tag">${tag.trim()}</span>`)
-                .join('');
-    
-            // Batasi panjang deskripsi yang ditampilkan
-            const maxDescriptionLength = 100; // Panjang maksimum deskripsi
+                .join("");
+
+            const maxDescriptionLength = 100;
             const isLongDescription = row[3].length > maxDescriptionLength;
             const shortDescription = row[3].slice(0, maxDescriptionLength);
-    
+
             return `
                 <div class="card">
                     <img src="${row[0]}" alt="${row[1]}">
@@ -201,124 +196,107 @@ const renderCards = async () => {
                             <a href="${row[4]}" target="_blank">${row[1]}</a>
                         </h3>
                         <p class="card-description" data-full="${row[3]}" data-short="${shortDescription}">
-                            ${isLongDescription ? shortDescription + '...' : row[3]}
+                            ${isLongDescription ? shortDescription + "..." : row[3]}
                         </p>
-                        ${isLongDescription ? `<button class="toggle-description">See More</button>` : ''}
+                        ${isLongDescription ? `<button class="toggle-description">See More</button>` : ""}
                     </div>
                 </div>
             `;
-        }).join('');
-    
-        // Tambahkan event listener untuk tombol "See More" dan "Hide"
-        document.querySelectorAll('.toggle-description').forEach(button => {
-            button.addEventListener('click', (event) => {
+        }).join("");
+
+        document.querySelectorAll(".toggle-description").forEach(button => {
+            button.addEventListener("click", () => {
                 const descriptionElement = button.previousElementSibling;
-                const isExpanded = button.textContent === 'Hide';
+                const isExpanded = button.textContent === "Hide";
                 if (isExpanded) {
-                    descriptionElement.textContent = descriptionElement.getAttribute('data-short') + '...';
-                    button.textContent = 'See More';
+                    descriptionElement.textContent = descriptionElement.getAttribute("data-short") + "...";
+                    button.textContent = "See More";
                 } else {
-                    descriptionElement.textContent = descriptionElement.getAttribute('data-full');
-                    button.textContent = 'Hide';
+                    descriptionElement.textContent = descriptionElement.getAttribute("data-full");
+                    button.textContent = "Hide";
                 }
             });
         });
-    
-        renderPagination(currentPage, totalPages); // Render ulang pagination
+
+        renderPagination(page, totalPages);
     };
-    
-    
+
+    // Fungsi untuk memperbarui halaman
     const updatePage = (newPage) => {
         const searchValue = searchBar.value.toLowerCase();
         const filterValue = tagFilter.value;
-        renderFiltered(searchValue, filterValue, newPage);
+        currentPage = newPage; // Update currentPage
+        renderFiltered(searchValue, filterValue, currentPage);
     };
-    
-    
-    // Jalankan ulang render saat ukuran layar berubah
-    window.addEventListener('resize', () => {
-        const searchValue = searchBar.value.toLowerCase();
-        const filterValue = tagFilter.value;
-        renderFiltered(searchValue, filterValue, 1); // Mulai dari halaman pertama
-    });
 
-    
-
-    // Fungsi untuk render tombol pagination
+    // Fungsi untuk merender tombol pagination
     const renderPagination = (currentPage, totalPages) => {
-        const pagination = document.getElementById('pagination');
-        pagination.innerHTML = ''; // Bersihkan pagination sebelum dirender ulang
-    
-        // Hanya tampilkan pagination jika jumlah halaman lebih dari 1
+        paginationContainer.innerHTML = "";
+
         if (totalPages <= 1) {
-            pagination.style.display = 'none'; // Sembunyikan container pagination
+            paginationContainer.style.display = "none";
             return;
         }
-        pagination.style.display = 'flex'; // Tampilkan container pagination
-    
-        // Tambahkan tombol "Previous"
-        const prevButton = document.createElement('button');
-        prevButton.textContent = 'Previous';
-        prevButton.className = 'pagination-btn';
-        if (currentPage === 1) {
-            prevButton.disabled = true;
-            prevButton.classList.add('disabled'); // Tambahkan class 'disabled' jika di halaman pertama
-        }
-        prevButton.addEventListener('click', () => updatePage(currentPage - 1));
-        pagination.appendChild(prevButton);
-    
-        // Tambahkan tombol nomor halaman
+        paginationContainer.style.display = "flex";
+
+        const prevButton = document.createElement("button");
+        prevButton.textContent = "Previous";
+        prevButton.className = "pagination-btn";
+        prevButton.disabled = currentPage === 1;
+        prevButton.addEventListener("click", () => updatePage(currentPage - 1));
+        paginationContainer.appendChild(prevButton);
+
         for (let i = 1; i <= totalPages; i++) {
-            const pageButton = document.createElement('button');
+            const pageButton = document.createElement("button");
             pageButton.textContent = i;
-            pageButton.className = 'pagination-btn';
+            pageButton.className = "pagination-btn";
             if (i === currentPage) {
-                pageButton.classList.add('active'); // Pastikan hanya tombol halaman aktif yang mendapat class 'active'
+                pageButton.classList.add("active");
             }
-            pageButton.addEventListener('click', () => updatePage(i));
-            pagination.appendChild(pageButton);
+            pageButton.addEventListener("click", () => updatePage(i));
+            paginationContainer.appendChild(pageButton);
         }
-    
-        // Tambahkan tombol "Next"
-        const nextButton = document.createElement('button');
-        nextButton.textContent = 'Next';
-        nextButton.className = 'pagination-btn';
-        if (currentPage === totalPages) {
-            nextButton.disabled = true;
-            nextButton.classList.add('disabled'); // Tambahkan class 'disabled' jika di halaman terakhir
-        }
-        nextButton.addEventListener('click', () => updatePage(currentPage + 1));
-        pagination.appendChild(nextButton);
+
+        const nextButton = document.createElement("button");
+        nextButton.textContent = "Next";
+        nextButton.className = "pagination-btn";
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.addEventListener("click", () => updatePage(currentPage + 1));
+        paginationContainer.appendChild(nextButton);
     };
-    
-    
-    
 
-    // Event untuk pencarian dan filter
-    searchButton.addEventListener('click', () => {
+    // Event listener untuk pencarian dan filter
+    searchButton.addEventListener("click", () => {
         const searchValue = searchBar.value.toLowerCase();
         const filterValue = tagFilter.value;
-        currentPage = 1; // Reset ke halaman 1
+        currentPage = 1;
         renderFiltered(searchValue, filterValue, currentPage);
     });
 
-    searchBar.addEventListener('input', () => {
+    searchBar.addEventListener("input", () => {
         const searchValue = searchBar.value.toLowerCase();
         const filterValue = tagFilter.value;
-        currentPage = 1; // Reset ke halaman 1
+        currentPage = 1;
         renderFiltered(searchValue, filterValue, currentPage);
     });
 
-    tagFilter.addEventListener('change', () => {
+    tagFilter.addEventListener("change", () => {
         const searchValue = searchBar.value.toLowerCase();
         const filterValue = tagFilter.value;
-        currentPage = 1; // Reset ke halaman 1
+        currentPage = 1;
         renderFiltered(searchValue, filterValue, currentPage);
     });
 
-    // Render awal
+    // Event listener untuk resize
+    window.addEventListener("resize", () => {
+        const searchValue = searchBar.value.toLowerCase();
+        const filterValue = tagFilter.value;
+        renderFiltered(searchValue, filterValue, currentPage); // Tetap di halaman saat ini
+    });
+
     renderFiltered();
 };
+
 
 // Fungsi fetch data dari Google Sheets
 const fetchServicesData = async () => {
@@ -328,11 +306,12 @@ const fetchServicesData = async () => {
         const rows = data.values.slice(1); // Abaikan header
         
         return rows.map(row => ({
-            image: row[0],
-            title: row[1],
-            price: row[2],
-            description: row[3],
-            features: row[4].split(',').map(feature => feature.trim()),
+            image: row[0] || "", // Pastikan kolom image ada
+            title: row[1] || "Untitled", // Default title jika kosong
+            price: row[2] || "Price not available", // Default price jika kosong
+            description: row[3] || "No description available.", // Default description jika kosong
+            features: (row[4] || "").split(',').map(feature => feature.trim()), // Default empty array jika tidak ada fitur
+            tags: (row[5] || "").split(',').map(tag => tag.trim()), // Default empty array jika tidak ada tags
         }));
     } catch (error) {
         console.error('Error fetching services data:', error);
@@ -340,26 +319,56 @@ const fetchServicesData = async () => {
     }
 };
 
+
 const renderServices = async () => {
     const servicesData = await fetchServicesData();
     const slider = document.querySelector(".services-slider");
+    const tagFilter = document.querySelector("#tag-filter"); // Dropdown untuk tag
+    let selectedTag = ""; // Simpan tag yang dipilih
 
-    slider.innerHTML = servicesData
-        .map(
-            (service) => `
-        <div class="card">
-            <img src="${service.image}" alt="${service.title}">
-            <h3>${service.title}</h3>
-            <p>${service.price}</p>
-            <p>${service.description}</p>
-            <ul>
-                ${service.features.map((feature) => `<li>${feature}</li>`).join("")}
-            </ul>
-        </div>
-    `
-        )
-        .join("");
+    // Render filter tag
+    const uniqueTags = [...new Set(servicesData.flatMap(service => service.tags))];
+    tagFilter.innerHTML = `
+        <option value="">All</option>
+        ${uniqueTags.map(tag => `<option value="${tag}">${tag}</option>`).join("")}
+    `;
+
+    // Fungsi untuk merender kartu layanan berdasarkan tag
+    const renderFilteredServices = (tag) => {
+        const filteredServices = tag
+            ? servicesData.filter(service => service.tags.includes(tag))
+            : servicesData;
+
+        slider.innerHTML = filteredServices
+            .map(
+                (service) => `
+            <div class="card">
+                <img src="${service.image}" alt="${service.title}">
+                <h3>${service.title}</h3>
+                <p>${service.price}</p>
+                <p>${service.description}</p>
+                <ul>
+                    ${service.features.map((feature) => `<li>${feature}</li>`).join("")}
+                </ul>
+                <div class="card-tags">
+                    ${service.tags.map(tag => `<span>${tag}</span>`).join("")}
+                </div>
+            </div>
+        `
+            )
+            .join("");
+    };
+
+    // Render awal tanpa filter
+    renderFilteredServices(selectedTag);
+
+    // Event listener untuk perubahan tag
+    tagFilter.addEventListener("change", (event) => {
+        selectedTag = event.target.value;
+        renderFilteredServices(selectedTag);
+    });
 };
+
 
 const initSlider = () => {
     const slider = document.querySelector(".services-slider");
@@ -470,9 +479,6 @@ const initSlider = () => {
         startAutoSlide();
     });
 };
-
-
-
 
 
 
