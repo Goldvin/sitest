@@ -652,19 +652,20 @@ footer {
     }
 
     .services-slider {
-        display: flex;
-        overflow: hidden; /* Sembunyikan kartu di luar viewport */
+        display: flex; /* Pastikan slider menggunakan flexbox */
+        transition: transform 0.5s ease-in-out; /* Untuk transisi */
     }
-
     .services-slider .card {
-        flex: 0 0 100%; /* Setiap kartu memakan 100% lebar slider */
+        flex: 0 0 100%; /* Satu kartu mengambil 100% dari lebar slider */
+        box-sizing: border-box;
+        margin-right: 0; /* Hilangkan jarak antar kartu */
     }
 
-    .slider-btn {
-        display: none; /* Sembunyikan tombol untuk mobile */
+    .services-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
     }
-
-
 
     .footer-container {
         flex-direction: column;

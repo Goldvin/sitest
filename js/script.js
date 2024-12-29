@@ -345,6 +345,7 @@ const renderServices = async () => {
 };
 
 
+
 const initSlider = () => {
     const slider = document.querySelector(".services-slider");
     const prevBtn = document.querySelector(".prev-btn");
@@ -368,7 +369,7 @@ const initSlider = () => {
 
     const updateSliderPosition = () => {
         slider.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-        slider.style.transition = "transform 0.3s ease-in-out"; // Tambahkan transisi
+        slider.style.transition = "transform 0.3s ease-in-out";
     };
 
     const startAutoSlide = () => {
@@ -455,6 +456,13 @@ const initSlider = () => {
         startAutoSlide();
     });
 };
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await renderServices(); // Tunggu hingga kartu selesai dirender
+    initSlider(); // Inisialisasi slider
+});
+
+
 
 document.addEventListener("DOMContentLoaded", async () => {
     await renderServices(); // Tunggu hingga kartu selesai dirender
