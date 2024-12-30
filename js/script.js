@@ -297,7 +297,6 @@ const renderCards = async () => {
     renderFiltered();
 };
 
-
 // Fungsi fetch data dari Google Sheets
 const fetchServicesData = async () => {
     try {
@@ -319,155 +318,157 @@ const fetchServicesData = async () => {
     }
 };
 
+let autoSlideInterval; // Untuk auto-slide interval
+
 const renderServices = async () => {
-    const servicesData = await fetchServicesData();
-    const slider = document.querySelector(".services-slider");
+  const slider = document.querySelector(".services-slider");
+  if (!slider) {
+    console.error("Element .services-slider tidak ditemukan!");
+    return;
+  }
 
-    // Render semua layanan tanpa filter tag
-    slider.innerHTML = servicesData
-        .map(
-            (service) => `
-            <div class="card">
-                <img src="${service.image}" alt="${service.title}">
-                <h3>${service.title}</h3>
-                <p>${service.price}</p>
-                <p>${service.description}</p>
-                <ul>
-                    ${service.features.map((feature) => `<li>${feature}</li>`).join("")}
-                </ul>
-                <div class="card-tags">
-                    ${service.tags.map(tag => `<span>${tag}</span>`).join("")}
-                </div>
-            </div>
-        `
-        )
-        .join("");
+  const servicesData = await fetchServicesData(); // Ambil data dari Google Sheets (sesuaikan fungsi fetchServicesData)
+  slider.innerHTML = servicesData
+    .map(
+      (service) => `
+        <div class="card">
+          <img src="${service.image}" alt="${service.title}">
+          <h3>${service.title}</h3>
+          <p>${service.price}</p>
+          <p>${service.description}</p>
+          <ul>
+            ${service.features.map((feature) => `<li>${feature}</li>`).join("")}
+          </ul>
+          <div class="card-tags">
+            ${service.tags.map((tag) => `<span>${tag}</span>`).join("")}
+          </div>
+        </div>
+      `
+    )
+    .join("");
+
+  initSlider();
 };
-
 
 
 const initSlider = () => {
     const slider = document.querySelector(".services-slider");
+    const cards = [...slider.querySelectorAll(".card")];
     const prevBtn = document.querySelector(".prev-btn");
     const nextBtn = document.querySelector(".next-btn");
-
-    const cards = slider.querySelectorAll(".card");
-    if (cards.length === 0) {
-        console.error("No cards found. Ensure data is loaded before initializing the slider.");
-        return;
-    }
-
-    const isMobile = window.innerWidth <= 768;
-    let cardWidth = isMobile
-        ? slider.offsetWidth // Satu kartu untuk mobile
-        : slider.offsetWidth / 3; // Tiga kartu untuk desktop
-    let currentIndex = 0;
+    let currentIndex = 0; // Indeks slide aktif
     let autoSlideInterval;
-
-    // Atur lebar kartu agar sesuai
-    cards.forEach(card => (card.style.flex = `0 0 ${cardWidth}px`));
-
-    const updateSliderPosition = () => {
-        slider.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-        slider.style.transition = "transform 0.3s ease-in-out";
+  
+    if (!slider || !cards.length || !prevBtn || !nextBtn) {
+      console.error("Elemen slider atau tombol navigasi tidak ditemukan!");
+      return;
+    }
+  
+    // Fungsi untuk mendapatkan jumlah kartu yang terlihat berdasarkan ukuran layar
+    const getVisibleCards = () => (window.innerWidth <= 768 ? 1 : 3); // 1 kartu di mobile, 3 kartu di desktop
+  
+    // Clone pertama dan terakhir untuk looping seamless
+    const createClones = () => {
+      const visibleCards = getVisibleCards();
+      const cloneBefore = cards.slice(-visibleCards).map((card) => card.cloneNode(true));
+      const cloneAfter = cards.slice(0, visibleCards).map((card) => card.cloneNode(true));
+      cloneBefore.forEach((clone) => slider.prepend(clone)); // Tambahkan ke awal
+      cloneAfter.forEach((clone) => slider.append(clone)); // Tambahkan ke akhir
     };
-
-    const startAutoSlide = () => {
-        autoSlideInterval = setInterval(() => {
-            if (currentIndex < cards.length - (isMobile ? 1 : 3)) {
-                currentIndex++;
-            } else {
-                currentIndex = 0; // Kembali ke slide pertama
-            }
-            updateSliderPosition();
-        }, 3000); // Slide otomatis setiap 3 detik
+  
+    // Fungsi untuk memperbarui posisi slider
+    const updateSliderPosition = (index) => {
+      const cardWidth = cards[0].offsetWidth + 20; // Lebar kartu + margin
+      slider.style.transition = "transform 1s cubic-bezier(0.25, 0.1, 0.25, 1)"; // Animasi lebih smooth
+      slider.style.transform = `translateX(-${index * cardWidth}px)`;
     };
-
-    const stopAutoSlide = () => {
-        clearInterval(autoSlideInterval);
+  
+    // Fungsi untuk mengatur posisi slider tanpa animasi
+    const setSliderPositionWithoutTransition = (index) => {
+      const cardWidth = cards[0].offsetWidth + 20; // Lebar kartu + margin
+      slider.style.transition = "none";
+      slider.style.transform = `translateX(-${index * cardWidth}px)`;
     };
-
-    // Tombol prev
-    prevBtn.addEventListener("click", () => {
-        stopAutoSlide();
-        if (currentIndex > 0) {
-            currentIndex--;
-        } else {
-            currentIndex = cards.length - (isMobile ? 1 : 3); // Pergi ke slide terakhir
-        }
-        updateSliderPosition();
-        startAutoSlide();
-    });
-
-    // Tombol next
+  
+    // Fungsi untuk slide ke depan
+    const slideNext = () => {
+      const visibleCards = getVisibleCards();
+      currentIndex += visibleCards;
+  
+      // Jika sudah sampai clone terakhir, lompat ke awal asli
+      if (currentIndex >= cards.length + visibleCards) {
+        setTimeout(() => {
+          currentIndex = visibleCards;
+          setSliderPositionWithoutTransition(currentIndex);
+        }, 1000); // Tunggu hingga transisi selesai (1s)
+      }
+  
+      updateSliderPosition(currentIndex);
+    };
+  
+    // Fungsi untuk slide ke belakang
+    const slidePrev = () => {
+      const visibleCards = getVisibleCards();
+      currentIndex -= visibleCards;
+  
+      // Jika sudah sampai clone pertama, lompat ke akhir asli
+      if (currentIndex < 0) {
+        setTimeout(() => {
+          currentIndex = cards.length;
+          setSliderPositionWithoutTransition(currentIndex);
+        }, 1000); // Tunggu hingga transisi selesai (1s)
+      }
+  
+      updateSliderPosition(currentIndex);
+    };
+  
+    // Tombol navigasi
     nextBtn.addEventListener("click", () => {
-        stopAutoSlide();
-        if (currentIndex < cards.length - (isMobile ? 1 : 3)) {
-            currentIndex++;
-        } else {
-            currentIndex = 0; // Kembali ke slide pertama
-        }
-        updateSliderPosition();
-        startAutoSlide();
+      slideNext();
+      restartAutoSlide(); // Restart auto-slide ketika tombol diklik
     });
-
-    // Geser manual (swipe) untuk mobile
-    let startX = 0;
-    let isSwiping = false;
-
-    slider.addEventListener("touchstart", (e) => {
-        stopAutoSlide();
-        startX = e.touches[0].clientX;
-        isSwiping = true;
+  
+    prevBtn.addEventListener("click", () => {
+      slidePrev();
+      restartAutoSlide(); // Restart auto-slide ketika tombol diklik
     });
-
-    slider.addEventListener("touchmove", (e) => {
-        if (isSwiping) {
-            const diffX = startX - e.touches[0].clientX;
-            if (diffX > 50 && currentIndex < cards.length - 1) {
-                currentIndex++;
-                updateSliderPosition();
-                isSwiping = false;
-            } else if (diffX < -50 && currentIndex > 0) {
-                currentIndex--;
-                updateSliderPosition();
-                isSwiping = false;
-            }
-        }
-    });
-
-    slider.addEventListener("touchend", () => {
-        isSwiping = false;
-        startAutoSlide();
-    });
-
-    // Mulai auto-slide
-    startAutoSlide();
-
-    // Responsif: Re-render saat layar berubah
+  
+    // Auto-slide
+    const startAutoSlide = () => {
+      autoSlideInterval = setInterval(() => {
+        slideNext();
+      }, 5000); // Auto-slide setiap 5 detik
+    };
+  
+    const restartAutoSlide = () => {
+      clearInterval(autoSlideInterval);
+      startAutoSlide();
+    };
+  
+    // Perbarui posisi slider saat window diresize
     window.addEventListener("resize", () => {
-        stopAutoSlide();
-        const isNowMobile = window.innerWidth <= 768;
-        cardWidth = isNowMobile
-            ? slider.offsetWidth
-            : slider.offsetWidth / 3;
-        cards.forEach(card => (card.style.flex = `0 0 ${cardWidth}px`));
-        updateSliderPosition();
-        startAutoSlide();
+      setSliderPositionWithoutTransition(currentIndex);
     });
-};
+  
+    // Inisialisasi slider
+    createClones(); // Tambahkan clones
+    const visibleCards = getVisibleCards();
+    currentIndex = visibleCards; // Mulai dari indeks pertama setelah clones
+    setSliderPositionWithoutTransition(currentIndex);
+    startAutoSlide();
+  };
+  
+  // Jalankan fungsi saat dokumen selesai dimuat
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      await renderServices();
+      initSlider();
+    } catch (error) {
+      console.error("Error saat render layanan:", error);
+    }
+  });
+  
 
-document.addEventListener("DOMContentLoaded", async () => {
-    await renderServices(); // Tunggu hingga kartu selesai dirender
-    initSlider(); // Inisialisasi slider
-});
-
-
-
-document.addEventListener("DOMContentLoaded", async () => {
-    await renderServices(); // Tunggu hingga kartu selesai dirender
-    initSlider(); // Inisialisasi slider
-});
 
 
 

@@ -373,19 +373,21 @@ nav {
     overflow: hidden; /* Pastikan konten tidak keluar dari container */
 }
 
+
 .services-slider {
     display: flex;
     gap: 20px;
-    transition: transform 0.5s ease-in-out; /* Perubahan lebih halus */
+    transition: transform 2s cubic-bezier(0.25, 0.1, 0.25, 1); /* Kehalusan lebih tinggi */
 }
+
 
 .services-slider .card {
     flex: 0 0 calc(33.33% - 20px);
     background-color: #fff; /* Latar belakang putih */
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Tambahkan bayangan lembut */
-    overflow: hidden; /* Pastikan elemen anak tidak keluar */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
 }
 
 .services-slider .card:hover {
@@ -396,6 +398,12 @@ nav {
 .services-slider .card img {
     max-width: 100%;
     border-radius: 12px 12px 0 0; /* Hanya bagian atas yang melengkung */
+}
+
+.services-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #333;
 }
 
 .services-slider .card h3 {
@@ -458,6 +466,14 @@ nav {
     text-transform: capitalize; /* Teks diawali dengan huruf besar */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sedikit bayangan untuk tag */
 }
+
+.services-slider .card .card-tags span:hover {
+    background-color: #4CAF50; /* Ubah ke hijau saat hover */
+    color: #fff; /* Teks menjadi putih */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Tambahkan bayangan */
+    transition: all 0.3s ease;
+}
+
 
 .slider-btn {
     position: absolute;
