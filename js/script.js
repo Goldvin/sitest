@@ -368,24 +368,15 @@ const initServiceSlider = () => {
       el: ".swiper-pagination",
       clickable: true,
     },
-    a11y: {
-      enabled: true, // Masih menjaga aksesibilitas
-      containerMessage: null, // Hindari memindahkan fokus
-      prevSlideMessage: null, // Nonaktifkan pesan navigasi
-      nextSlideMessage: null,
-    },
     breakpoints: {
       768: {
-        slidesPerView: 3, // Menampilkan 3 kartu di desktop
-        centeredSlides: true, // Masih memperlihatkan sebagian kartu
+        slidesPerView: 3,
       },
     },
+    // Prevent default focus behavior
+    slideToClickedSlide: false, // Nonaktifkan perpindahan slide dengan klik
   });
 };
-
-
-
-
 
 const renderFooter = async () => {
     const data = await fetchData(urls.footer);

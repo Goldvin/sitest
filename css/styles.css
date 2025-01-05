@@ -1,4 +1,10 @@
-:root {
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Cegah pergeseran horizontal */
+  }
+  :root {
     --navbar-bg: #3498db;
     --navbar-font: #ffffff;
     --navbar-font-size: 16px;
@@ -365,16 +371,17 @@ nav {
     position: relative;
 }
 
-.service-section .swiper-container {
-    overflow: hidden;
-  }
-  
 .services-slider .swiper-slide {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+.service-section .swiper-button-next,
+.service-section .swiper-button-prev,
+.service-section .swiper-pagination-bullet {
+  outline: none;
+}
 
 
 /* Gaya untuk kartu */
