@@ -447,8 +447,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Menghapus layar loading setelah durasi tertentu
   setTimeout(() => {
     loadingScreen.classList.add("hidden");
-  }, 4000); // 3 detik atau sesuaikan dengan kebutuhan Anda
+  }, 3000); // Durasi 3 detik (atau sesuaikan dengan kebutuhan)
 });
+
 
 
 const init = async () => {
