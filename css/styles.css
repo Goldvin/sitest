@@ -365,6 +365,10 @@ nav {
     position: relative;
 }
 
+.service-section .swiper-container {
+    overflow: hidden;
+  }
+  
 .services-slider .swiper-slide {
   display: flex;
   justify-content: center;

@@ -352,12 +352,12 @@ const renderServices = async () => {
 
 const initServiceSlider = () => {
   new Swiper(".services-slider", {
-    slidesPerView: 1.2, // Menampilkan 1 kartu penuh + 20% kartu berikutnya
+    slidesPerView: 1.2,
     spaceBetween: 20,
-    centeredSlides: true, // Memusatkan slide aktif
-    loop: true, // Looping slider
+    centeredSlides: true,
+    loop: true,
     autoplay: {
-      delay: 3000, // Slide otomatis setiap 3 detik
+      delay: 3000,
       disableOnInteraction: false,
     },
     navigation: {
@@ -367,6 +367,12 @@ const initServiceSlider = () => {
     pagination: {
       el: ".swiper-pagination",
       clickable: true,
+    },
+    a11y: {
+      enabled: true, // Masih menjaga aksesibilitas
+      containerMessage: null, // Hindari memindahkan fokus
+      prevSlideMessage: null, // Nonaktifkan pesan navigasi
+      nextSlideMessage: null,
     },
     breakpoints: {
       768: {
