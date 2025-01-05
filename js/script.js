@@ -352,8 +352,9 @@ const renderServices = async () => {
 
 const initServiceSlider = () => {
   new Swiper(".services-slider", {
-    slidesPerView: 1, // Mobile default
+    slidesPerView: 1.2, // Menampilkan 1 kartu penuh + 20% kartu berikutnya
     spaceBetween: 20,
+    centeredSlides: true, // Memusatkan slide aktif
     loop: true, // Looping slider
     autoplay: {
       delay: 3000, // Slide otomatis setiap 3 detik
@@ -369,11 +370,14 @@ const initServiceSlider = () => {
     },
     breakpoints: {
       768: {
-        slidesPerView: 3, // Tampilkan 3 card di desktop
+        slidesPerView: 3, // Menampilkan 3 kartu di desktop
+        centeredSlides: true, // Masih memperlihatkan sebagian kartu
       },
     },
   });
 };
+
+
 
 
 

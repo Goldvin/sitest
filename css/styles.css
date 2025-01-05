@@ -359,10 +359,10 @@ nav {
 
 /* Styling umum slider */
 .services-slider {
-  width: 100%;
-  padding: 20px 0;
-  position: relative;
-  background: #f8f9fa; /* Warna latar belakang terang */
+    width: 100%;
+    padding: 40px 0;
+    background: #f4f4f4; /* Background abu terang */
+    position: relative;
 }
 
 .services-slider .swiper-slide {
@@ -371,99 +371,104 @@ nav {
   align-items: center;
 }
 
+
+
 /* Gaya untuk kartu */
 swiper-slide .card {
-  width: 100%;
-  max-width: 280px;
-  border: 1px solid #e0e0e0; /* Warna border tipis */
-  border-radius: 12px;
-  overflow: hidden;
-  background: #ffffff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Efek bayangan */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 95%;
+    max-width: 350px; /* Ukuran lebih besar */
+    border: none;
+    border-radius: 16px; /* Radius besar untuk tampilan modern */
+    overflow: hidden;
+    background: linear-gradient(145deg, #ffffff, #f9f9f9); /* Gradasi lembut */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.05); /* Efek bayangan */
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
 swiper-slide .card:hover {
-  transform: translateY(-5px); /* Sedikit efek naik saat hover */
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15); /* Bayangan lebih besar */
+    transform: translateY(-8px) scale(1.02); /* Efek naik dan zoom saat hover */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1); /* Bayangan lebih kuat */  
 }
 
 /* Gambar di dalam kartu */
 swiper-slide.card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
+    width: 100%;
+    height: 200px; /* Ukuran lebih besar */
+    object-fit: cover;
 }
 
 /* Konten kartu */
 .card h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #333;
-  margin: 15px 10px 5px;
-  text-transform: capitalize;
+    font-size: 1.4rem; /* Lebih besar */
+    font-weight: 700;
+    color: #222;
+    margin: 15px 20px 10px;
+    text-transform: capitalize;
 }
 
 .card p {
-  font-size: 0.9rem;
-  color: #555;
-  margin: 5px 10px;
+    font-size: 1rem;
+    color: #555;
+    margin: 5px 20px;
+    line-height: 1.5;
 }
 
 .card ul {
-  padding: 0;
-  margin: 10px 10px;
-  list-style: none;
+    padding: 0;
+    margin: 15px 20px;
+    list-style: none;
 }
 
 .card ul li {
-  font-size: 0.85rem;
-  color: #777;
-  margin: 5px 0;
-  display: flex;
-  align-items: center;
+    font-size: 0.95rem;
+    color: #444;
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
 }
 
 .card ul li:before {
-  content: "✔"; /* Simbol checklist */
-  color: #4caf50; /* Hijau */
-  margin-right: 8px;
-  font-size: 0.9rem;
+    content: "✓"; /* Simbol checklist */
+    color: #4caf50; /* Hijau */
+    margin-right: 10px;
+    font-size: 1.2rem;
 }
 
 /* Tag kartu */
 .card-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px;
 }
 
 .card-tags span {
-  background: #e0f7fa; /* Warna biru muda */
-  color: #00796b;
-  padding: 5px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  text-transform: capitalize;
-  white-space: nowrap;
+    background: #e3f2fd; /* Biru pastel */
+    color: #1976d2; /* Biru gelap */
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Tombol navigasi */
 .swiper-button-next,
 .swiper-button-prev {
-  color: #00796b; /* Warna hijau-biru */
-  font-size: 1.5rem;
+    color: #1976d2;
+    font-size: 1.8rem;
 }
 
 .swiper-pagination-bullet {
-  background: #00796b; /* Warna hijau-biru */
-  opacity: 0.6;
+    background: #1976d2;
+    opacity: 0.6;
 }
 
 .swiper-pagination-bullet-active {
-  background: #004d40; /* Hijau tua */
-  opacity: 1;
+    background: #004ba0; /* Biru lebih gelap */
+    opacity: 1;
 }
 
 
@@ -544,6 +549,7 @@ footer {
     #content {
         grid-template-columns: repeat(3, 1fr); /* 3 kolom */
     }
+    
 }@media (max-width: 768px) {
     .hamburger {
         cursor: pointer;
