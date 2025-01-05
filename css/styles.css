@@ -357,149 +357,116 @@ nav {
     box-shadow: none;
 }
 
-.services-section {
-    margin: 20px auto;
-    text-align: center;
-    position: relative;
-    padding: 40px 20px;
-    background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* Latar belakang gradasi lembut */
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Bayangan lembut */
-}
-
-.services-container {
-    position: relative;
-    width: 100%;
-    overflow: hidden; /* Pastikan konten tidak keluar dari container */
-}
-
-
+/* Styling umum slider */
 .services-slider {
-    display: flex;
-    gap: 20px;
-    transition: transform 2s cubic-bezier(0.25, 0.1, 0.25, 1); /* Kehalusan lebih tinggi */
+  width: 100%;
+  padding: 20px 0;
+  position: relative;
+  background: #f8f9fa; /* Warna latar belakang terang */
+}
+
+.services-slider .swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Gaya untuk kartu */
+swiper-slide .card {
+  width: 100%;
+  max-width: 280px;
+  border: 1px solid #e0e0e0; /* Warna border tipis */
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Efek bayangan */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+swiper-slide .card:hover {
+  transform: translateY(-5px); /* Sedikit efek naik saat hover */
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15); /* Bayangan lebih besar */
+}
+
+/* Gambar di dalam kartu */
+swiper-slide.card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+/* Konten kartu */
+.card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin: 15px 10px 5px;
+  text-transform: capitalize;
+}
+
+.card p {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 5px 10px;
+}
+
+.card ul {
+  padding: 0;
+  margin: 10px 10px;
+  list-style: none;
+}
+
+.card ul li {
+  font-size: 0.85rem;
+  color: #777;
+  margin: 5px 0;
+  display: flex;
+  align-items: center;
+}
+
+.card ul li:before {
+  content: "✔"; /* Simbol checklist */
+  color: #4caf50; /* Hijau */
+  margin-right: 8px;
+  font-size: 0.9rem;
+}
+
+/* Tag kartu */
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 10px;
+}
+
+.card-tags span {
+  background: #e0f7fa; /* Warna biru muda */
+  color: #00796b;
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+/* Tombol navigasi */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #00796b; /* Warna hijau-biru */
+  font-size: 1.5rem;
+}
+
+.swiper-pagination-bullet {
+  background: #00796b; /* Warna hijau-biru */
+  opacity: 0.6;
+}
+
+.swiper-pagination-bullet-active {
+  background: #004d40; /* Hijau tua */
+  opacity: 1;
 }
 
 
-.services-slider .card {
-    flex: 0 0 calc(33.33% - 20px);
-    background-color: #fff; /* Latar belakang putih */
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Tambahkan bayangan lembut */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    
-}
-
-.services-slider .card:hover {
-    transform: translateY(-10px); /* Efek melayang */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Bayangan lebih intens saat hover */
-}
-
-.services-slider .card img {
-    max-width: 100%;
-    border-radius: 12px 12px 0 0; /* Hanya bagian atas yang melengkung */
-}
-
-.services-section h2 {
-    font-size: 2.5rem;
-    margin-bottom: 30px;
-    color: #333;
-}
-
-.services-slider .card h3 {
-    margin: 15px 0 10px;
-    font-size: 20px;
-    color: #222; /* Warna teks yang lebih solid */
-    font-weight: 600; /* Teks lebih tebal untuk judul */
-    letter-spacing: 0.5px; /* Memberikan sedikit jarak antar huruf */
-    text-transform: capitalize; /* Setiap kata dimulai dengan huruf besar */
-    text-align: center; /* Judul di tengah */
-}
-
-.services-slider .card p {
-    margin: 10px 15px;
-    font-size: 14px;
-    color: #555; /* Warna abu-abu lembut untuk deskripsi */
-    line-height: 1.8; /* Spasi antar baris lebih luas untuk kemudahan baca */
-    text-align: justify; /* Teks rata kanan-kiri untuk tampilan lebih rapi */
-    font-family: 'Roboto', sans-serif; /* Font modern */
-}
-
-.services-slider .card ul {
-    margin: 10px 15px;
-    padding-left: 20px;
-    font-size: 14px;
-    color: #444; /* Warna lebih gelap dibanding deskripsi */
-    line-height: 1.6;
-    list-style: none; /* Hilangkan bullet points */
-}
-
-.services-slider .card ul li {
-    position: relative;
-    padding-left: 25px;
-    margin-bottom: 10px;
-}
-
-.services-slider .card ul li::before {
-    content: '✔'; /* Simbol checklist untuk setiap item */
-    position: absolute;
-    left: 0;
-    color: #4CAF50; /* Warna hijau modern untuk checklist */
-    font-size: 14px;
-}
-
-.services-slider .card .card-tags {
-    margin-bottom: 10px;
-    display: flex;
-    gap: 5px;
-    justify-content: center; /* Tag di tengah */
-    flex-wrap: wrap; /* Jika tag terlalu banyak, akan turun ke baris berikutnya */
-}
-
-.services-slider .card .card-tags span {
-    background-color: #f0f0f0; /* Latar belakang abu-abu terang */
-    color: #555; /* Warna teks tag */
-    padding: 5px 10px;
-    font-size: 12px;
-    border-radius: 15px; /* Membuat tag berbentuk oval */
-    font-weight: 500;
-    text-transform: capitalize; /* Teks diawali dengan huruf besar */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sedikit bayangan untuk tag */
-}
-
-.services-slider .card .card-tags span:hover {
-    background-color: #4CAF50; /* Ubah ke hijau saat hover */
-    color: #fff; /* Teks menjadi putih */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Tambahkan bayangan */
-    transition: all 0.3s ease;
-}
-
-
-.slider-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.7); /* Warna tombol lebih gelap */
-    color: white;
-    border: none;
-    padding: 12px 18px;
-    border-radius: 50%; /* Tombol berbentuk bulat */
-    cursor: pointer;
-    z-index: 10;
-    transition: background-color 0.3s ease;
-}
-
-.slider-btn:hover {
-    background-color: rgba(0, 0, 0, 0.9); /* Perubahan warna saat hover */
-}
-
-.slider-btn.prev-btn {
-    left: 10px;
-}
-
-.slider-btn.next-btn {
-    right: 10px;
-}
 
 footer {
     background-color: var(--footer-bg, #1e1e1e);

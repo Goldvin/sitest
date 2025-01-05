@@ -6,6 +6,9 @@
     <title>Dynamic Website</title>
     <link rel="icon" id="favicon" type="image/x-icon">
     <link rel="stylesheet" href="css/styles.css">
+    <!-- Tambahkan di bagian `<head>` untuk CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css">
+
 </head>
 <body>
     <nav id="navbar">
@@ -31,16 +34,16 @@
     </div>
     <div class="content" id="content"></div>
     <div id="pagination" class="pagination-container"></div>
-    <div class="services-section">
-        <h2>Our Services</h2>
-        <div class="services-container">
-            <button class="slider-btn prev-btn">❮</button>
-            <div class="services-slider">
-                <!-- Cards akan di-render secara dinamis -->
-            </div>
-            <button class="slider-btn next-btn">❯</button>
+    <div class="services-slider swiper-container">
+        <div class="swiper-wrapper">
+          <!-- Card akan di-generate di sini -->
         </div>
-    </div>
+        <!-- Tombol Navigasi -->
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+        <!-- Navigasi Bullets -->
+        <div class="swiper-pagination"></div>
+      </div>>
     
     
 
@@ -62,5 +65,8 @@
     </footer>
 
     <script src="js/script.js"></script>
+    <!-- Tambahkan sebelum penutup tag `<body>` untuk JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+
 </body>
 </html>
