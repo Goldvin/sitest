@@ -441,6 +441,16 @@ const fetchDataWithCache = async (url, key) => {
     return data;
 };
 
+document.addEventListener("DOMContentLoaded", () => {
+  const loadingScreen = document.getElementById("loading-screen");
+
+  // Menghapus layar loading setelah durasi tertentu
+  setTimeout(() => {
+    loadingScreen.classList.add("hidden");
+  }, 4000); // 3 detik atau sesuaikan dengan kebutuhan Anda
+});
+
+
 const init = async () => {
     await renderNavbar();
     await renderCarousel();
