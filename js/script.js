@@ -3,11 +3,12 @@ const API_KEY = 'AIzaSyAmOoWpQprHyZS97DiIXCdy2LFkAe0POa8';
 
 const urls = {
     navbar: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Navbar?key=${API_KEY}`,
+    lastUpdated: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Body!H1?key=${API_KEY}`,
     body: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Body?key=${API_KEY}`,
     header: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Header?key=${API_KEY}`,
     footer: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Footer?key=${API_KEY}`,
-    services: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Services?key=${API_KEY}`, 
-
+    services: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Services?key=${API_KEY}`,
+    comments: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Comments?key=${API_KEY}`, 
 };
 
 const fetchData = async (url) => {
@@ -143,6 +144,64 @@ const renderCarousel = async () => {
     }, 5000); // 5 seconds
 };
 
+// Fungsi untuk memparsing waktu dalam format dd/MM/yyyy HH:mm:ss
+// Fungsi untuk memparsing waktu dalam format dd/MM/yyyy HH:mm:ss
+const parseDate = (dateString) => {
+    if (!dateString) {
+        console.error("Tanggal tidak valid:", dateString);
+        return new Date(); // Mengembalikan waktu sekarang jika format tidak valid
+    }
+
+    const [datePart, timePart] = dateString.split(" ");
+    if (!datePart || !timePart) {
+        console.error("Format tanggal atau waktu tidak valid:", dateString);
+        return new Date(); // Mengembalikan waktu sekarang jika format tidak valid
+    }
+
+    const [day, month, year] = datePart.split("/").map(Number);
+    const [hours, minutes, seconds] = timePart.split(":").map(Number);
+
+    // Pastikan nilai tanggal dan waktu valid
+    if (isNaN(day) || isNaN(month) || isNaN(year) || isNaN(hours) || isNaN(minutes) || isNaN(seconds)) {
+        console.error("Nilai tanggal atau waktu tidak valid:", dateString);
+        return new Date(); // Mengembalikan waktu sekarang jika format tidak valid
+    }
+
+    return new Date(year, month - 1, day, hours, minutes, seconds); // Bulan dikurangi 1 karena dimulai dari 0 (Jan = 0)
+};
+
+// Fungsi untuk menghitung waktu dalam format yang diinginkan
+const formatTime = (lastUpdated) => {
+    const now = new Date();
+
+    // Pastikan lastUpdated valid sebelum diproses
+    const updatedTime = parseDate(lastUpdated);
+    
+    // Jika updatedTime adalah waktu sekarang (berarti format tidak valid), kembalikan string default
+    if (updatedTime.getTime() === now.getTime()) {
+        return "Waktu tidak valid";
+    }
+
+    const diffMs = now - updatedTime; // Selisih waktu dalam milidetik
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffMinutes < 60) {
+        return `${diffMinutes} menit yang lalu`;
+    } else if (diffHours < 24) {
+        return `${diffHours} jam yang lalu`;
+    } else if (diffDays === 1) {
+        return `Kemarin`;
+    } else {
+        // Format detail waktu
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        return updatedTime.toLocaleDateString('id-ID', options);
+    }
+};
+
+
+// Fungsi utama untuk merender kartu
 const renderCards = async () => {
     const data = await fetchData(urls.body);
     const content = document.getElementById("content");
@@ -150,7 +209,7 @@ const renderCards = async () => {
     const searchBar = document.getElementById("search-bar");
     const searchButton = document.getElementById("search-button");
     const paginationContainer = document.getElementById("pagination");
-
+    
     const maxCardsPerPageMobile = 3; // Batas kartu per halaman pada perangkat mobile
     let currentPage = 1; // Menyimpan halaman saat ini
 
@@ -163,8 +222,8 @@ const renderCards = async () => {
     // Fungsi untuk merender data yang difilter
     const renderFiltered = (searchValue = "", filterValue = "", page = 1) => {
         const isMobileView = isMobile();
-        const cardsPerPage = isMobileView ? 3 : 6; // 3 kartu di mobile, 6 kartu di desktop
-
+        const cardsPerPage = isMobileView ? 3 : 6;
+    
         const filteredData = data.values.slice(1).filter(row => {
             const titleMatch = row[1].toLowerCase().includes(searchValue);
             const descriptionMatch = row[3].toLowerCase().includes(searchValue);
@@ -172,21 +231,24 @@ const renderCards = async () => {
             const filterMatch = filterValue === "" || row[2].split(",").map(tag => tag.trim()).includes(filterValue);
             return (titleMatch || descriptionMatch || tagMatch) && filterMatch;
         });
-
+    
         const totalPages = Math.ceil(filteredData.length / cardsPerPage);
         const startIndex = (page - 1) * cardsPerPage;
         const paginatedData = filteredData.slice(startIndex, startIndex + cardsPerPage);
-
+    
         content.innerHTML = paginatedData.map(row => {
             const tags = row[2]
                 .split(",")
                 .map(tag => `<span class="card-tag">${tag.trim()}</span>`)
                 .join("");
-
+        
             const maxDescriptionLength = 100;
             const isLongDescription = row[3].length > maxDescriptionLength;
             const shortDescription = row[3].slice(0, maxDescriptionLength);
-
+        
+            // Hitung format waktu pembaruan
+            const formattedTime = formatTime(row[5]); // `row[5]` adalah kolom "Last Updated"
+        
             return `
                 <div class="card">
                     <img src="${row[0]}" alt="${row[1]}">
@@ -199,11 +261,18 @@ const renderCards = async () => {
                             ${isLongDescription ? shortDescription + "..." : row[3]}
                         </p>
                         ${isLongDescription ? `<button class="toggle-description">See More</button>` : ""}
+                        <div class="card-footer">
+                            <button class="card-link-btn">
+                                <a href="${row[4]}" target="_blank">Visit Link</a>
+                            </button>
+                            <p class="last-updated">Last Updated: ${formattedTime}</p>
+                        </div>
                     </div>
                 </div>
             `;
         }).join("");
-
+    
+        // Tambahkan event listener untuk tombol "See More"
         document.querySelectorAll(".toggle-description").forEach(button => {
             button.addEventListener("click", () => {
                 const descriptionElement = button.previousElementSibling;
@@ -217,9 +286,10 @@ const renderCards = async () => {
                 }
             });
         });
-
+    
         renderPagination(page, totalPages);
     };
+    
 
     // Fungsi untuk memperbarui halaman
     const updatePage = (newPage) => {
@@ -377,6 +447,100 @@ const initServiceSlider = () => {
     slideToClickedSlide: false, // Nonaktifkan perpindahan slide dengan klik
   });
 };
+
+// /// Fungsi untuk mengambil 10 komentar terbaru
+// const fetchComments = async () => {
+//     try {
+//         const response = await fetch(urls.comments);
+//         const data = await response.json();
+//         const rows = data.values.slice(1); // Abaikan header row
+
+//         // Ambil 10 komentar terbaru
+//         return rows.slice(-10).reverse().map(row => ({
+//             timestamp: row[0] || "Unknown time",
+//             email: row[1] || "Anonymous",
+//             name: row[2] || "Anonymous",
+//             comment: row[3] || "",
+//         }));
+//     } catch (error) {
+//         console.error("Error fetching comments:", error);
+//         return [];
+//     }
+// };
+
+// // Fungsi untuk menyimpan komentar ke Google Sheets
+// const saveComment = async (commentData) => {
+//     const saveURL = "https://script.google.com/macros/s/AKfycbxwcAMZZxC4dzCa8jyh052DZmJagHV45HMrV0UaLGYu0eUMp__c5faBXuX_oOHMk0V-/exec";
+//     try {
+//         const response = await fetch(saveURL, {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json",
+//             },
+//             body: JSON.stringify(commentData),
+//         });
+
+//         const responseData = await response.json();
+//         if (responseData.status !== "success") {
+//             console.error("Error Response:", responseData);
+//             throw new Error(responseData.message || "Failed to save comment.");
+//         }
+
+//         console.log("Comment saved successfully!");
+//     } catch (error) {
+//         console.error("Error saving comment:", error);
+//     }
+// };
+
+// // Fungsi untuk merender komentar ke dalam HTML
+// const renderComments = async () => {
+//     const commentsList = document.querySelector("#comments-list");
+//     commentsList.innerHTML = "<p>Loading comments...</p>";
+
+//     const comments = await fetchComments();
+
+//     if (comments.length === 0) {
+//         commentsList.innerHTML = "<p>No comments yet. Be the first to comment!</p>";
+//         return;
+//     }
+
+//     commentsList.innerHTML = comments
+//         .map(
+//             (comment) => `
+//         <li>
+//           <strong>${comment.name} (${comment.email})</strong> - <em>${comment.timestamp}</em>
+//           <p>${comment.comment}</p>
+//         </li>
+//       `
+//         )
+//         .join("");
+// };
+
+// // Event listener untuk form submit
+// document.querySelector("#comment-form").addEventListener("submit", async (e) => {
+//     e.preventDefault();
+
+//     const name = document.querySelector("#name").value;
+//     const email = document.querySelector("#email").value;
+//     const comment = document.querySelector("#comment").value;
+
+//     const commentData = { name, email, comment };
+
+//     // Simpan komentar ke Google Sheets
+//     await saveComment(commentData);
+
+//     // Render ulang komentar
+//     await renderComments();
+
+//     // Reset form
+//     e.target.reset();
+// });
+
+// // Render komentar saat dokumen selesai dimuat
+// document.addEventListener("DOMContentLoaded", () => {
+//     renderComments();
+// });
+
 
 const renderFooter = async () => {
     const data = await fetchData(urls.footer);
