@@ -357,6 +357,30 @@ nav {
     color: #fff;
 }
 
+/* Styling tombol */
+.card-footer button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.card-footer button:hover {
+    background-color: #0056b3;
+}
+
+/* Styling teks waktu pembaruan */
+.card-footer .last-updated {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 10px;
+    text-align: right;
+}
 
 .pagination-container {
     display: flex;
@@ -775,6 +799,15 @@ footer {
     .filter-search select {
         width: calc(100% - 20px);
         max-width: none;
+    }
+
+    .card-footer button {
+        width: 100%; /* Tombol memenuhi lebar pada layar kecil */
+        text-align: center;
+    }
+
+    .card-footer .last-updated {
+        text-align: center; /* Waktu pembaruan berada di tengah */
     }
 
     .services-slider {
