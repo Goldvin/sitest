@@ -8,6 +8,8 @@ const urls = {
     header: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Header?key=${API_KEY}`,
     footer: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Footer?key=${API_KEY}`,
     services: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Services?key=${API_KEY}`,
+    faq: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/FAQ?key=${API_KEY}`,
+    metadata: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/FAQ_Metadata?key=${API_KEY}`,
     comments: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Comments?key=${API_KEY}`, 
 };
 
@@ -447,6 +449,70 @@ const initServiceSlider = () => {
     slideToClickedSlide: false, // Nonaktifkan perpindahan slide dengan klik
   });
 };
+
+const loadFAQ = async () => {
+    try {
+        // Fetch FAQ data
+        const responseFAQ = await fetch(urls.faq);
+        const dataFAQ = await responseFAQ.json();
+
+        // Fetch Metadata
+        const responseMetadata = await fetch(urls.metadata);
+        const dataMetadata = await responseMetadata.json();
+
+        const faqContainer = document.querySelector("#faq-container");
+        const title = dataMetadata.values.find(row => row[0] === "Title")[1];
+        const description = dataMetadata.values.find(row => row[0] === "Description")[1];
+
+        // Set title and description
+        document.querySelector(".faq-title").textContent = title;
+        document.querySelector(".faq-description").textContent = description;
+
+        // Populate FAQ items
+        faqContainer.innerHTML = dataFAQ.values
+            .map(
+                row => `
+            <div class="faq-item">
+                <div class="faq-question">
+                    ${row[0]}
+                     <svg
+        class="faq-toggle-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        >
+        <polyline points="6 9 12 15 18 9"></polyline> <!-- Chevron down -->
+    </svg>
+                </div>
+                <div class="faq-answer">
+                    ${row[1]}
+                </div>
+            </div>
+        `
+            )
+            .join("");
+
+        // Add toggle functionality
+        const faqItems = document.querySelectorAll(".faq-item");
+        faqItems.forEach(item => {
+            const question = item.querySelector(".faq-question");
+            question.addEventListener("click", () => {
+                item.classList.toggle("open");
+            });
+        });
+    } catch (error) {
+        console.error("Error loading FAQ:", error);
+    }
+};
+
+// Initialize FAQ
+document.addEventListener("DOMContentLoaded", loadFAQ);
 
 // /// Fungsi untuk mengambil 10 komentar terbaru
 // const fetchComments = async () => {
