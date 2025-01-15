@@ -16,7 +16,7 @@ const initializeLoadingScreen = () => {
         // Menghapus layar loading setelah durasi tertentu
         setTimeout(() => {
             loadingScreen.classList.add("hidden");
-        }, 1000); // Durasi 3 detik
+        }, 1500); // Durasi 3 detik
     } else {
         console.warn("Elemen loading screen tidak ditemukan!");
     }
