@@ -27,11 +27,13 @@
         </div>
     </nav>
     <div class="header-carousel" id="header-carousel"></div>
+    
     <div class="filter-search">
         <select id="tag-filter">
             <option value="">Filter by tag</option>
         </select>
     </div>
+      
     <div class="content" id="content"></div>
     
     <div id="pagination" class="pagination-container"></div>
@@ -50,29 +52,16 @@
         <div id="faq-container"></div>
         
     </div>
+    <section id="about-section" class="about">
+      <div class="about-container">
+        <img id="about-image" src="" alt="About Image" class="about-image">
+        <div class="about-content">
+          <h2 id="about-title"></h2>
+          <p id="about-description"></p>
+        </div>
+      </div>
+    </section>
     
-
-      <!-- <section id="comments-section">
-  <h2>Leave a Comment</h2>
-  <form id="comment-form">
-    <label for="email">Email</label>
-    <input type="email" id="email" name="email" required>
-
-    <label for="name">Name</label>
-    <input type="text" id="name" name="name" required>
-
-    <label for="comment">Comment</label>
-    <textarea id="comment" name="comment" required></textarea>
-
-    <button type="submit">Submit</button>
-  </form>
-
-  <div id="comments-list">
-    <h3>Recent Comments</h3>
-    <ul id="comments">
-    </ul>
-  </div>
-</section> -->
 
       
       <div id="loading-screen">
@@ -100,7 +89,7 @@
         </div>
     </footer>
 
-    <script src="js/script.js"></script>
+    <script type="module" src="js/main.js"></script>
     <!-- Tambahkan sebelum penutup tag `<body>` untuk JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
 
