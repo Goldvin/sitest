@@ -474,11 +474,19 @@ nav {
     position: relative;
 }
 
-.services-slider .swiper-slide {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.services-slider /* Swiper Container Adjustment */
+.swiper-slide {
+    width: 100%; /* Hindari elemen keluar dari viewport */
+    box-sizing: border-box; /* Pastikan padding diperhitungkan */
 }
+
+/* Untuk memastikan tidak ada elemen swiper keluar dari batas */
+.swiper-container {
+    width: auto; /* Sesuaikan lebar dengan konten */
+    flex-shrink: 0;
+    overflow-x: hidden; /* Cegah elemen meluas ke kanan */
+}
+
 
 .service-section .swiper-button-next,
 .service-section .swiper-button-prev,
