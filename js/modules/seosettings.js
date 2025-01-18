@@ -1,15 +1,20 @@
 import { fetchData } from "../utils/cache.js";
 import { urls } from "../config/api.js";
 
-const applySEOSettings = async () => {
+export const applySEOSettings = async () => {
     try {
-        const response = await fetch(urls.seo_settings); // Panggil API dari Apps Script
-        const seoSettings = await response.json(); // Parse hasil JSON
-
-        if (!seoSettings) {
-            console.error("Gagal mengambil data SEO dari Web App");
+        const seoData = await fetchData(urls.seo_settings);
+        
+        if (!seoData || !seoData.values) {
+            console.error("Gagal mengambil data SEO dari Google Sheets");
             return;
         }
+
+        // Konversi array ke objek key-value
+        let seoSettings = {};
+        seoData.values.slice(1).forEach(row => {
+            if (row.length >= 2) seoSettings[row[0]] = row[1];
+        });
 
         // Set Meta Title
         if (seoSettings.meta_title) {
@@ -17,15 +22,23 @@ const applySEOSettings = async () => {
         }
 
         // Set Meta Description
-        const metaDescription = document.querySelector("meta[name='description']");
-        if (metaDescription && seoSettings.meta_description) {
-            metaDescription.setAttribute("content", seoSettings.meta_description);
-        }
+        updateMetaTag("description", seoSettings.meta_description);
+        updateMetaTag("keywords", seoSettings.meta_keywords);
 
-        // Set Social Media Image (Open Graph)
-        const metaOGImage = document.querySelector("meta[property='og:image']");
-        if (metaOGImage && seoSettings.social_image) {
-            metaOGImage.setAttribute("content", seoSettings.social_image);
+        // Set Open Graph Metadata
+        updateMetaTag("og:title", seoSettings.og_title);
+        updateMetaTag("og:description", seoSettings.og_description);
+        updateMetaTag("og:image", seoSettings.social_image);
+
+        // Set Canonical URL
+        updateLinkTag("canonical", seoSettings.canonical);
+
+        // Set Robots Meta Tag
+        updateMetaTag("robots", seoSettings.robots);
+
+        // Set Favicon
+        if (seoSettings.favicon) {
+            updateFavicon(seoSettings.favicon);
         }
 
         // Set Google Analytics
@@ -39,14 +52,6 @@ const applySEOSettings = async () => {
         }
         if (seoSettings.drift_chat_id) {
             loadDriftChat(seoSettings.drift_chat_id);
-        }
-
-        // Set Favicon
-        if (seoSettings.favicon) {
-            const link = document.querySelector("link[rel='icon']") || document.createElement("link");
-            link.rel = "icon";
-            link.href = seoSettings.favicon;
-            document.head.appendChild(link);
         }
 
         // Set External Links Behavior
@@ -66,6 +71,31 @@ const applySEOSettings = async () => {
     }
 };
 
+// Fungsi untuk memperbarui Meta Tag
+const updateMetaTag = (name, content) => {
+    if (!content) return;
+    let meta = document.querySelector(`meta[name="${name}"]`) || document.createElement("meta");
+    meta.name = name;
+    meta.content = content;
+    document.head.appendChild(meta);
+};
+
+// Fungsi untuk memperbarui Link Tag
+const updateLinkTag = (rel, href) => {
+    if (!href) return;
+    let link = document.querySelector(`link[rel="${rel}"]`) || document.createElement("link");
+    link.rel = rel;
+    link.href = href;
+    document.head.appendChild(link);
+};
+
+// Fungsi untuk memperbarui Favicon
+const updateFavicon = (href) => {
+    let link = document.querySelector("link[rel='icon']") || document.createElement("link");
+    link.rel = "icon";
+    link.href = href;
+    document.head.appendChild(link);
+};
 
 // Fungsi untuk memuat Google Analytics
 const loadGoogleAnalytics = (trackingID) => {
@@ -77,9 +107,7 @@ const loadGoogleAnalytics = (trackingID) => {
 
     script.onload = () => {
         window.dataLayer = window.dataLayer || [];
-        function gtag() {
-            window.dataLayer.push(arguments);
-        }
+        function gtag() { window.dataLayer.push(arguments); }
         gtag("js", new Date());
         gtag("config", trackingID);
     };
@@ -93,7 +121,15 @@ const loadCrispChat = (crispID) => {
     script.src = "https://client.crisp.chat/l.js";
     script.async = true;
     document.head.appendChild(script);
+
+    script.onload = () => {
+        // Mengatur agar chatbox tidak fullscreen
+        window.$crisp.push(["config", "layout:wide", false]); // Matikan mode fullscreen
+        window.$crisp.push(["set", "user:nickname", ["Asisten AI"]]); 
+
+    };
 };
+
 
 // Fungsi untuk memuat Drift Chat
 const loadDriftChat = (driftID) => {
@@ -101,7 +137,7 @@ const loadDriftChat = (driftID) => {
         (window.drift.q = window.drift.q || []).push(arguments);
     };
     const script = document.createElement("script");
-    script.src = "https://js.driftt.com/include/" + new Date().getTime() + "/" + driftID + ".js";
+    script.src = `https://js.driftt.com/include/${new Date().getTime()}/${driftID}.js`;
     script.async = true;
     document.head.appendChild(script);
 };

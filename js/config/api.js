@@ -2,7 +2,7 @@ const SHEET_ID = '1G1UjWN_ru3PdQf-qlKuwIT5CCfQSuA6reOzQZdu6FW8';
 const API_KEY = 'AIzaSyAmOoWpQprHyZS97DiIXCdy2LFkAe0POa8';
 
 export const urls = {
-    seo_settings: "https://script.google.com/macros/s/AKfycbwTgbMAyXnluWdGmeLQc8WHbTswaPTjD_DNqI_2OqshGcJ7hKaABPxPTJe7nj-pStDa/exec",
+    seo_settings: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/SEO_Settings?key=${API_KEY}`,
     navbar: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Navbar?key=${API_KEY}`,
     about: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/About?key=${API_KEY}`,
     lastUpdated: `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Body!H1?key=${API_KEY}`,

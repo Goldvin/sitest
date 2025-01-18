@@ -1,5 +1,6 @@
 import { fetchData } from "./utils/cache.js"; // Utilitas untuk caching data
 import { urls } from "./config/api.js"; // URL API dari konfigurasi
+import { applySEOSettings } from "./modules/seosettings.js"; // Import modul SEO
 import { renderNavbar } from "./modules/navbar.js";
 import { renderCarousel } from "./modules/carousel.js";
 import { renderBody } from "./modules/body.js";
@@ -7,6 +8,7 @@ import { renderServices } from "./modules/services.js";
 import { renderFooter } from "./modules/footer.js";
 import { renderFAQ } from "./modules/faq.js"; // Tambahkan jika ada modul FAQ
 import { renderAbout } from "./modules/about.js";
+
 
 // Fungsi untuk inisialisasi loading screen
 const initializeLoadingScreen = () => {
@@ -25,6 +27,7 @@ const initializeLoadingScreen = () => {
 // Fungsi utama untuk memuat semua komponen halaman
 const init = async () => {
     try {
+        await applySEOSettings();
         await renderNavbar();
         await renderCarousel();
         await renderBody();
