@@ -21,6 +21,10 @@ export const applySEOSettings = async () => {
             document.title = seoSettings.meta_title;
         }
 
+        updateMetaTag("og:image:width", "1200");
+        updateMetaTag("og:image:height", "630");
+
+
         // Set Meta Description
         updateMetaTag("description", seoSettings.meta_description);
         updateMetaTag("keywords", seoSettings.meta_keywords);
@@ -72,13 +76,14 @@ export const applySEOSettings = async () => {
 };
 
 // Fungsi untuk memperbarui Meta Tag
-const updateMetaTag = (name, content) => {
+const updateMetaTag = (property, content) => {
     if (!content) return;
-    let meta = document.querySelector(`meta[name="${name}"]`) || document.createElement("meta");
-    meta.name = name;
-    meta.content = content;
+    let meta = document.querySelector(`meta[property="${property}"]`) || document.createElement("meta");
+    meta.setAttribute("property", property);
+    meta.setAttribute("content", content);
     document.head.appendChild(meta);
 };
+
 
 // Fungsi untuk memperbarui Link Tag
 const updateLinkTag = (rel, href) => {
